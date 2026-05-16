@@ -1,13 +1,16 @@
 package com.vb.kanjimap_android.app.di
 
+import com.vb.kanjimap_android.core.datastore.SessionDataStore
+import com.vb.kanjimap_android.core.network.api.AuthApi
+import com.vb.kanjimap_android.feature.session.data.repository.SessionRepositoryImpl
+import com.vb.kanjimap_android.feature.session.domain.repository.SessionRepository
+
 object RepositoryModule {
-    // Placeholder for feature-level bindings.
-    // Real repository interfaces and implementations should stay in feature/core modules,
-    // then be wired here when those types exist in the project.
-    //
-    // Planned bindings:
-    // - SessionRepository
-    // - LibraryRepository
-    // - LearningRepository
-    // - ReviewRepository
+    fun provideSessionRepository(
+        authApi: AuthApi,
+        sessionDataStore: SessionDataStore
+    ): SessionRepository = SessionRepositoryImpl(
+        authApi = authApi,
+        sessionDataStore = sessionDataStore
+    )
 }

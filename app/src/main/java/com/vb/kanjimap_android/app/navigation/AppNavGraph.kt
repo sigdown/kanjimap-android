@@ -19,6 +19,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.vb.kanjimap_android.feature.session.presentation.AuthScreen
 
 @Composable
 fun rememberAppNavController(): NavHostController = rememberNavController()
@@ -71,7 +72,14 @@ fun AppNavGraph(
             )
         }
         composable(Destination.Auth.route) {
-            PlaceholderScreen(title = "Auth", description = "Fullscreen auth flow placeholder.")
+            AuthScreen(
+                onLoginCLick = {
+                    navController.navigate(Destination.Home.route) {
+                        popUpTo(Destination.Auth.route) { inclusive = true }
+                        launchSingleTop = true
+                    }
+                }
+            )
         }
         composable(Destination.Review.route) {
             PlaceholderScreen(title = "Review", description = "Protected fullscreen review flow placeholder.")

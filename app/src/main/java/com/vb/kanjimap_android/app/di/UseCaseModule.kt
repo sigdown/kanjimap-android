@@ -1,10 +1,21 @@
 package com.vb.kanjimap_android.app.di
 
+import com.vb.kanjimap_android.feature.session.domain.repository.SessionRepository
+import com.vb.kanjimap_android.feature.session.domain.usecase.GetCurrentUserUseCase
+import com.vb.kanjimap_android.feature.session.domain.usecase.LoginUseCase
+import com.vb.kanjimap_android.feature.session.domain.usecase.LogoutUseCase
+import com.vb.kanjimap_android.feature.session.domain.usecase.RegisterUseCase
+
 object UseCaseModule {
-    // Placeholder for feature-level use case bindings.
-    // Planned groups:
-    // - auth/session use cases
-    // - library use cases
-    // - learning use cases
-    // - review/progress use cases
+    fun provideLoginUseCase(sessionRepository: SessionRepository): LoginUseCase =
+        LoginUseCase(sessionRepository)
+
+    fun provideRegisterUseCase(sessionRepository: SessionRepository): RegisterUseCase =
+        RegisterUseCase(sessionRepository)
+
+    fun provideGetCurrentUserUseCase(sessionRepository: SessionRepository): GetCurrentUserUseCase =
+        GetCurrentUserUseCase(sessionRepository)
+
+    fun provideLogoutUseCase(sessionRepository: SessionRepository): LogoutUseCase =
+        LogoutUseCase(sessionRepository)
 }
