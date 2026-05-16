@@ -6,6 +6,8 @@ import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.vb.kanjimap_android.core.common.Constants
+import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
@@ -13,8 +15,8 @@ import kotlinx.coroutines.runBlocking
 
 private val Context.sessionDataStore by preferencesDataStore(name = Constants.SESSION_DATASTORE_NAME)
 
-class SessionDataStore(
-    private val context: Context
+class SessionDataStore @Inject constructor(
+    @param:ApplicationContext private val context: Context
 ) {
     private object Keys {
         val accessToken = stringPreferencesKey("access_token")

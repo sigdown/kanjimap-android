@@ -5,13 +5,15 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.preferencesDataStore
 import com.vb.kanjimap_android.core.common.Constants
+import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 private val Context.settingsDataStore by preferencesDataStore(name = Constants.SETTINGS_DATASTORE_NAME)
 
-class SettingsDataStore(
-    private val context: Context
+class SettingsDataStore @Inject constructor(
+    @param:ApplicationContext private val context: Context
 ) {
     private object Keys {
         val isOnboardingCompleted = booleanPreferencesKey("is_onboarding_completed")

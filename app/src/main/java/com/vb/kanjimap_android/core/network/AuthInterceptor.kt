@@ -2,13 +2,13 @@ package com.vb.kanjimap_android.core.network
 
 import com.vb.kanjimap_android.core.common.Constants
 import com.vb.kanjimap_android.core.datastore.SessionDataStore
+import javax.inject.Inject
 import okhttp3.Interceptor
 import okhttp3.Response
 
-class AuthInterceptor(
+class AuthInterceptor @Inject constructor(
     private val sessionDataStore: SessionDataStore
 ) : Interceptor {
-
     override fun intercept(chain: Interceptor.Chain): Response {
         val original = chain.request()
         val token = sessionDataStore.getAccessTokenBlocking()

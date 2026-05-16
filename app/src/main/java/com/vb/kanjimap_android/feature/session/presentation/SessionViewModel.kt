@@ -7,13 +7,16 @@ import com.vb.kanjimap_android.feature.session.domain.usecase.GetCurrentUserUseC
 import com.vb.kanjimap_android.feature.session.domain.usecase.LoginUseCase
 import com.vb.kanjimap_android.feature.session.domain.usecase.LogoutUseCase
 import com.vb.kanjimap_android.feature.session.domain.usecase.RegisterUseCase
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class SessionViewModel(
+@HiltViewModel
+class SessionViewModel @Inject constructor(
     private val sessionRepository: SessionRepository,
     private val loginUseCase: LoginUseCase,
     private val registerUseCase: RegisterUseCase,

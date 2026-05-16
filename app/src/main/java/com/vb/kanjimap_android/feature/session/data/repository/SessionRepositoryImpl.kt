@@ -8,11 +8,12 @@ import com.vb.kanjimap_android.feature.session.data.mapper.toDomain
 import com.vb.kanjimap_android.feature.session.domain.model.Session
 import com.vb.kanjimap_android.feature.session.domain.model.User
 import com.vb.kanjimap_android.feature.session.domain.repository.SessionRepository
+import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 
-class SessionRepositoryImpl(
+class SessionRepositoryImpl @Inject constructor(
     private val authApi: AuthApi,
     private val sessionDataStore: SessionDataStore
 ) : SessionRepository {
