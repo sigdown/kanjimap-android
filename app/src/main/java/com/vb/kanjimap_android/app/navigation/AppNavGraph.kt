@@ -19,6 +19,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.vb.kanjimap_android.feature.library.presentation.KanjiDetailsRoute
+import com.vb.kanjimap_android.feature.library.presentation.KanjiRoute
+import com.vb.kanjimap_android.feature.library.presentation.WordDetailsRoute
+import com.vb.kanjimap_android.feature.library.presentation.WordsRoute
 import com.vb.kanjimap_android.feature.session.presentation.AuthRoute
 
 @Composable
@@ -56,19 +60,17 @@ fun AppNavGraph(
             )
         }
         composable(Destination.Words.route) {
-            PlaceholderScreen(
-                title = "Words",
-                description = "Public dictionary area.",
-                primaryActionLabel = "Open Word 42",
-                onPrimaryAction = { navController.navigate(Destination.WordDetails.createRoute(42L)) }
+            WordsRoute(
+                onWordClick = { wordId ->
+                    navController.navigate(Destination.WordDetails.createRoute(wordId))
+                }
             )
         }
         composable(Destination.Kanji.route) {
-            PlaceholderScreen(
-                title = "Kanji",
-                description = "Public kanji library area.",
-                primaryActionLabel = "Open Kanji 7",
-                onPrimaryAction = { navController.navigate(Destination.KanjiDetails.createRoute(7L)) }
+            KanjiRoute(
+                onKanjiClick = { kanjiId ->
+                    navController.navigate(Destination.KanjiDetails.createRoute(kanjiId))
+                }
             )
         }
         composable(Destination.Auth.route) {
@@ -105,20 +107,31 @@ fun AppNavGraph(
             arguments = listOf(navArgument("wordId") { type = NavType.LongType })
         ) { backStackEntry ->
             val wordId = backStackEntry.arguments?.getLong("wordId")
-            PlaceholderScreen(
-                title = "Word Details",
-                description = "wordId=$wordId"
-            )
+            if (wordId != null) {
+                WordDetailsRoute(
+                    wordId = wordId,
+                    onKanjiClick = { kanjiId ->
+                        navController.navigate(Destination.KanjiDetails.createRoute(kanjiId))
+                    },
+                    onRelatedWordClick = { relatedWordId ->
+                        navController.navigate(Destination.WordDetails.createRoute(relatedWordId))
+                    }
+                )
+            }
         }
         composable(
             route = Destination.KanjiDetails.route,
             arguments = listOf(navArgument("kanjiId") { type = NavType.LongType })
         ) { backStackEntry ->
             val kanjiId = backStackEntry.arguments?.getLong("kanjiId")
-            PlaceholderScreen(
-                title = "Kanji Details",
-                description = "kanjiId=$kanjiId"
-            )
+            if (kanjiId != null) {
+                KanjiDetailsRoute(
+                    kanjiId = kanjiId,
+                    onWordClick = { wordId ->
+                        navController.navigate(Destination.WordDetails.createRoute(wordId))
+                    }
+                )
+            }
         }
         composable(
             route = Destination.BlockDetails.route,

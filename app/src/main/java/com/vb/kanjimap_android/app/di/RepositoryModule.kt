@@ -1,5 +1,7 @@
 package com.vb.kanjimap_android.app.di
 
+import com.vb.kanjimap_android.feature.library.data.repository.LibraryRepositoryImpl
+import com.vb.kanjimap_android.feature.library.domain.repository.LibraryRepository
 import com.vb.kanjimap_android.feature.session.data.repository.SessionRepositoryImpl
 import com.vb.kanjimap_android.feature.session.domain.repository.SessionRepository
 import dagger.Binds
@@ -11,6 +13,12 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class RepositoryModule {
+
+    @Binds
+    @Singleton
+    abstract fun bindLibraryRepository(
+        libraryRepositoryImpl: LibraryRepositoryImpl
+    ): LibraryRepository
 
     @Binds
     @Singleton
