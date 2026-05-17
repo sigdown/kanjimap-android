@@ -1,10 +1,7 @@
 package com.vb.kanjimap_android.feature.library.presentation
 
-import android.content.Context
-import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
@@ -13,7 +10,7 @@ fun WordsRoute(
     onWordClick: (Long) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val viewModel: LibraryViewModel = hiltViewModel(activityOwner(LocalContext.current))
+    val viewModel: LibraryViewModel = hiltViewModel()
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
 
     WordsScreen(
@@ -24,5 +21,3 @@ fun WordsRoute(
         modifier = modifier
     )
 }
-
-private fun activityOwner(context: Context): ComponentActivity = context as ComponentActivity

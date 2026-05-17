@@ -2,7 +2,7 @@ package com.vb.kanjimap_android.feature.session.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.vb.kanjimap_android.feature.session.domain.repository.SessionRepository
+import com.vb.kanjimap_android.feature.session.domain.usecase.HasSavedSessionUseCase
 import com.vb.kanjimap_android.feature.session.domain.usecase.GetCurrentUserUseCase
 import com.vb.kanjimap_android.feature.session.domain.usecase.LoginUseCase
 import com.vb.kanjimap_android.feature.session.domain.usecase.LogoutUseCase
@@ -20,8 +20,8 @@ class SessionViewModel @Inject constructor(
     private val loginUseCase: LoginUseCase,
     private val registerUseCase: RegisterUseCase,
     private val getCurrentUserUseCase: GetCurrentUserUseCase,
-    private val logoutUseCase: LogoutUseCase,
-    private val sessionRepository: SessionRepository
+    private val hasSavedSessionUseCase: HasSavedSessionUseCase,
+    private val logoutUseCase: LogoutUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SessionUiState())
@@ -98,7 +98,7 @@ class SessionViewModel @Inject constructor(
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
 
             runCatching {
-                if (!sessionRepository.hasSavedSession()) {
+                if (!hasSavedSessionUseCase()) {
                     _uiState.update {
                         it.copy(
                             isAuthenticated = false,

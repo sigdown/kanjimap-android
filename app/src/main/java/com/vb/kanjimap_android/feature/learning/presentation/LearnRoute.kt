@@ -1,11 +1,8 @@
 package com.vb.kanjimap_android.feature.learning.presentation
 
-import android.content.Context
-import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vb.kanjimap_android.feature.session.presentation.SessionViewModel
@@ -16,9 +13,8 @@ fun LearnRoute(
     onAuthClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val owner = activityOwner(LocalContext.current)
-    val sessionViewModel: SessionViewModel = hiltViewModel(owner)
-    val learningViewModel: LearningViewModel = hiltViewModel(owner)
+    val sessionViewModel: SessionViewModel = hiltViewModel()
+    val learningViewModel: LearningViewModel = hiltViewModel()
     val sessionState = sessionViewModel.uiState.collectAsStateWithLifecycle().value
     val uiState = learningViewModel.uiState.collectAsStateWithLifecycle().value
 
@@ -37,5 +33,3 @@ fun LearnRoute(
         modifier = modifier
     )
 }
-
-private fun activityOwner(context: Context): ComponentActivity = context as ComponentActivity
