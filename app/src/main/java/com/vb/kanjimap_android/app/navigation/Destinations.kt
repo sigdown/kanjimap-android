@@ -21,8 +21,8 @@ sealed class Destination(val route: String) {
         fun createRoute(blockId: Long): String = "block_details/$blockId"
     }
 
-    data object Study : Destination("study/{blockId}") {
-        fun createRoute(blockId: Long): String = "study/$blockId"
+    data object Study : Destination("study/{blockId}?mode={mode}") {
+        fun createRoute(blockId: Long, mode: String): String = "study/$blockId?mode=$mode"
     }
 }
 

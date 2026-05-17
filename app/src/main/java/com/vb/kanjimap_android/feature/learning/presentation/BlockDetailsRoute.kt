@@ -1,4 +1,4 @@
-package com.vb.kanjimap_android.feature.session.presentation
+package com.vb.kanjimap_android.feature.learning.presentation
 
 import android.content.Context
 import androidx.activity.ComponentActivity
@@ -10,25 +10,25 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 @Composable
-fun AuthRoute(
-    onAuthSuccess: () -> Unit,
-    modifier: Modifier = Modifier,
+fun BlockDetailsRoute(
+    blockId: Long,
+    onStudyClick: (StudyMode) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val owner = activityOwner(LocalContext.current)
-    val viewModel: SessionViewModel = hiltViewModel(owner)
+    val viewModel: LearningViewModel = hiltViewModel(owner)
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
 
-    LaunchedEffect(uiState.isAuthenticated, uiState.currentUser) {
-        if (uiState.isAuthenticated && uiState.currentUser != null) {
-            onAuthSuccess()
-        }
+    LaunchedEffect(blockId) {
+        viewModel.loadBlockDetails(blockId)
     }
 
-    AuthScreen(
-        uiState = uiState,
-        onLogin = viewModel::login,
-        onRegister = viewModel::register,
-        onSwitchMode = viewModel::setRegisterMode,
+    BlockDetailsScreen(
+        uiState = uiState.blockDetails,
+        onRetry = { viewModel.loadBlockDetails(blockId, force = true) },
+        onStudyWordsClick = { onStudyClick(StudyMode.WORDS) },
+        onStudyKanjiClick = { onStudyClick(StudyMode.KANJI) },
+        onStudyAllClick = { onStudyClick(StudyMode.ALL) },
         modifier = modifier
     )
 }

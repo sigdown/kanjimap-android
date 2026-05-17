@@ -9,15 +9,15 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface DictionaryApi {
-    @GET("dictionary/words/search")
+    @GET("words")
     suspend fun searchWords(@Query("query") query: String): List<WordSearchItemDto>
 
-    @GET("dictionary/words/{id}")
+    @GET("words/{id}")
     suspend fun getWordDetails(@Path("id") id: Long): WordDetailsDto
 
-    @GET("dictionary/kanji/search")
+    @GET("kanji")
     suspend fun searchKanji(@Query("query") query: String): List<KanjiSearchItemDto>
 
-    @GET("dictionary/kanji/{id}")
+    @GET("kanji/{id}")
     suspend fun getKanjiDetails(@Path("id") id: Long): KanjiDetailsDto
 }

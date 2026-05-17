@@ -2,6 +2,8 @@ package com.vb.kanjimap_android.app.di
 
 import com.vb.kanjimap_android.feature.library.data.repository.LibraryRepositoryImpl
 import com.vb.kanjimap_android.feature.library.domain.repository.LibraryRepository
+import com.vb.kanjimap_android.feature.learning.data.repository.LearningRepositoryImpl
+import com.vb.kanjimap_android.feature.learning.domain.repository.LearningRepository
 import com.vb.kanjimap_android.feature.session.data.repository.SessionRepositoryImpl
 import com.vb.kanjimap_android.feature.session.domain.repository.SessionRepository
 import dagger.Binds
@@ -19,6 +21,12 @@ abstract class RepositoryModule {
     abstract fun bindLibraryRepository(
         libraryRepositoryImpl: LibraryRepositoryImpl
     ): LibraryRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindLearningRepository(
+        learningRepositoryImpl: LearningRepositoryImpl
+    ): LearningRepository
 
     @Binds
     @Singleton

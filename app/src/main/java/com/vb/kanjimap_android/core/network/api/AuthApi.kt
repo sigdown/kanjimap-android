@@ -10,7 +10,7 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 
 interface AuthApi {
-    @GET("health")
+    @GET("/health")
     suspend fun healthCheck(): HealthResponseDto
 
     @POST("auth/register")

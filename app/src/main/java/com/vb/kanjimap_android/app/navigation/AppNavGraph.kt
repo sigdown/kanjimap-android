@@ -19,6 +19,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.vb.kanjimap_android.feature.learning.presentation.BlockDetailsRoute
+import com.vb.kanjimap_android.feature.learning.presentation.LearnRoute
+import com.vb.kanjimap_android.feature.learning.presentation.StudyMode
+import com.vb.kanjimap_android.feature.learning.presentation.StudyRoute
 import com.vb.kanjimap_android.feature.library.presentation.KanjiDetailsRoute
 import com.vb.kanjimap_android.feature.library.presentation.KanjiRoute
 import com.vb.kanjimap_android.feature.library.presentation.WordDetailsRoute
@@ -50,13 +54,11 @@ fun AppNavGraph(
             )
         }
         composable(Destination.Learn.route) {
-            GuestCapableScreen(
-                title = "Learn",
-                description = "Guest-capable learning entry point. Protected study flow starts deeper in navigation.",
-                primaryActionLabel = "Open Block 1",
-                onPrimaryAction = { navController.navigate(Destination.BlockDetails.createRoute(1L)) },
-                secondaryActionLabel = "Authorize",
-                onSecondaryAction = { navController.navigate(Destination.Auth.route) }
+            LearnRoute(
+                onBlockClick = { blockId ->
+                    navController.navigate(Destination.BlockDetails.createRoute(blockId))
+                },
+                onAuthClick = { navController.navigate(Destination.Auth.route) }
             )
         }
         composable(Destination.Words.route) {
@@ -76,9 +78,12 @@ fun AppNavGraph(
         composable(Destination.Auth.route) {
             AuthRoute(
                 onAuthSuccess = {
-                    navController.navigate(Destination.Home.route) {
-                        popUpTo(Destination.Auth.route) { inclusive = true }
-                        launchSingleTop = true
+                    val returned = navController.popBackStack()
+                    if (!returned) {
+                        navController.navigate(Destination.Home.route) {
+                            popUpTo(Destination.Auth.route) { inclusive = true }
+                            launchSingleTop = true
+                        }
                     }
                 }
             )
@@ -138,22 +143,33 @@ fun AppNavGraph(
             arguments = listOf(navArgument("blockId") { type = NavType.LongType })
         ) { backStackEntry ->
             val blockId = backStackEntry.arguments?.getLong("blockId")
-            PlaceholderScreen(
-                title = "Block Details",
-                description = "blockId=$blockId",
-                primaryActionLabel = "Start Study",
-                onPrimaryAction = { navController.navigate(Destination.Study.createRoute(blockId ?: 0L)) }
-            )
+            if (blockId != null) {
+                BlockDetailsRoute(
+                    blockId = blockId,
+                    onStudyClick = { mode ->
+                        navController.navigate(Destination.Study.createRoute(blockId, mode.value))
+                    }
+                )
+            }
         }
         composable(
             route = Destination.Study.route,
-            arguments = listOf(navArgument("blockId") { type = NavType.LongType })
+            arguments = listOf(
+                navArgument("blockId") { type = NavType.LongType },
+                navArgument("mode") {
+                    type = NavType.StringType
+                    defaultValue = StudyMode.WORDS.value
+                }
+            )
         ) { backStackEntry ->
             val blockId = backStackEntry.arguments?.getLong("blockId")
-            PlaceholderScreen(
-                title = "Study",
-                description = "Protected study flow for blockId=$blockId"
-            )
+            val mode = StudyMode.fromValue(backStackEntry.arguments?.getString("mode"))
+            if (blockId != null) {
+                StudyRoute(
+                    blockId = blockId,
+                    mode = mode
+                )
+            }
         }
     }
 }
