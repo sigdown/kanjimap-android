@@ -1,0 +1,30 @@
+package com.vb.kanjimap_android.feature.review.presentation
+
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+
+@Composable
+fun ReviewRoute(
+    onAuthClick: () -> Unit,
+    onClose: () -> Unit,
+    onGoHome: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val viewModel: ReviewViewModel = hiltViewModel()
+    val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
+
+    ReviewScreen(
+        uiState = uiState,
+        onAuthClick = onAuthClick,
+        onClose = onClose,
+        onGoHome = onGoHome,
+        onRetry = viewModel::loadReview,
+        onShowAnswer = viewModel::revealAnswer,
+        onAnswerChange = viewModel::updateAnswerInput,
+        onSubmitAnswer = viewModel::submitAnswer,
+        onNextCard = viewModel::nextCard,
+        modifier = modifier
+    )
+}

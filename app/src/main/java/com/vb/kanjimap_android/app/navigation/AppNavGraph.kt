@@ -28,6 +28,7 @@ import com.vb.kanjimap_android.feature.library.presentation.KanjiDetailsRoute
 import com.vb.kanjimap_android.feature.library.presentation.KanjiRoute
 import com.vb.kanjimap_android.feature.library.presentation.WordDetailsRoute
 import com.vb.kanjimap_android.feature.library.presentation.WordsRoute
+import com.vb.kanjimap_android.feature.review.presentation.ReviewRoute
 import com.vb.kanjimap_android.feature.session.presentation.AuthRoute
 
 @Composable
@@ -89,7 +90,16 @@ fun AppNavGraph(
             )
         }
         composable(Destination.Review.route) {
-            PlaceholderScreen(title = "Review", description = "Protected fullscreen review flow placeholder.")
+            ReviewRoute(
+                onAuthClick = { navController.navigate(Destination.Auth.route) },
+                onClose = { navController.popBackStack() },
+                onGoHome = {
+                    navController.navigate(Destination.Home.route) {
+                        popUpTo(Destination.Home.route) { inclusive = false }
+                        launchSingleTop = true
+                    }
+                }
+            )
         }
         composable(Destination.Saved.route) {
             PlaceholderScreen(title = "Saved", description = "Saved content placeholder.")
