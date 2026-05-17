@@ -226,6 +226,7 @@ fun StudyCardView(
                 text = card.prompt,
                 style = MaterialTheme.typography.displaySmall,
                 fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center
             )
             if (isAnswerVisible) {
@@ -233,6 +234,7 @@ fun StudyCardView(
                     Text(
                         text = it,
                         style = MaterialTheme.typography.titleLarge,
+                        modifier = Modifier.fillMaxWidth(),
                         textAlign = TextAlign.Center
                     )
                 }
@@ -241,6 +243,7 @@ fun StudyCardView(
                         text = it,
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.fillMaxWidth(),
                         textAlign = TextAlign.Center
                     )
                 }
@@ -288,12 +291,15 @@ private fun StudyMetaBlock(
         Text(
             text = label,
             style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.primary
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.fillMaxWidth(),
+            textAlign = TextAlign.Center
         )
         values.forEach { value ->
             Text(
                 text = value,
                 style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center
             )
         }

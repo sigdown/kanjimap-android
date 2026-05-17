@@ -19,6 +19,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.vb.kanjimap_android.feature.home.presentation.HomeRoute
 import com.vb.kanjimap_android.feature.learning.presentation.BlockDetailsRoute
 import com.vb.kanjimap_android.feature.learning.presentation.LearnRoute
 import com.vb.kanjimap_android.feature.learning.presentation.StudyMode
@@ -44,13 +45,12 @@ fun AppNavGraph(
         modifier = modifier.padding(innerPadding)
     ) {
         composable(Destination.Home.route) {
-            GuestCapableScreen(
-                title = "Home",
-                description = "Guest-capable top-level screen. Feature UI can replace this placeholder later.",
-                primaryActionLabel = "Open Review",
-                onPrimaryAction = { navController.navigate(Destination.Review.route) },
-                secondaryActionLabel = "Authorize",
-                onSecondaryAction = { navController.navigate(Destination.Auth.route) }
+            HomeRoute(
+                onAuthClick = { navController.navigate(Destination.Auth.route) },
+                onOpenReview = { navController.navigate(Destination.Review.route) },
+                onOpenBlocks = { navController.navigate(Destination.Learn.route) },
+                onOpenWords = { navController.navigate(Destination.Words.route) },
+                onOpenKanji = { navController.navigate(Destination.Kanji.route) }
             )
         }
         composable(Destination.Learn.route) {

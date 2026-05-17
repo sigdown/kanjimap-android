@@ -7,18 +7,23 @@ import com.vb.kanjimap_android.feature.learning.domain.model.StudyCard
 import com.vb.kanjimap_android.feature.learning.domain.model.StudyCardType
 import com.vb.kanjimap_android.feature.learning.domain.usecase.GetBlockDetailsUseCase
 import com.vb.kanjimap_android.feature.learning.domain.usecase.GetBlocksUseCase
+import com.vb.kanjimap_android.feature.library.domain.usecase.GetWordDetailsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
 @HiltViewModel
 class LearningViewModel @Inject constructor(
     private val getBlocksUseCase: GetBlocksUseCase,
-    private val getBlockDetailsUseCase: GetBlockDetailsUseCase
+    private val getBlockDetailsUseCase: GetBlockDetailsUseCase,
+    private val getWordDetailsUseCase: GetWordDetailsUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(LearningUiState())
@@ -124,6 +129,7 @@ class LearningViewModel @Inject constructor(
                 ?.takeIf { it.block.learningBlockId == blockId }
             if (cachedDetails != null) {
                 setStudyState(blockId = blockId, mode = mode, details = cachedDetails)
+                loadAndApplyWordMeanings(blockId = blockId, mode = mode, details = cachedDetails)
                 return@launch
             }
 
@@ -154,6 +160,7 @@ class LearningViewModel @Inject constructor(
                         )
                     }
                     setStudyState(blockId = blockId, mode = mode, details = details)
+                    loadAndApplyWordMeanings(blockId = blockId, mode = mode, details = details)
                 }
                 .onFailure { throwable ->
                     _uiState.update {
@@ -212,9 +219,10 @@ class LearningViewModel @Inject constructor(
     private fun setStudyState(
         blockId: Long,
         mode: StudyMode,
-        details: LearningBlockDetails
+        details: LearningBlockDetails,
+        wordMeanings: Map<Long, List<String>> = emptyMap()
     ) {
-        val cards = buildStudyCards(details, mode)
+        val cards = buildStudyCards(details, mode, wordMeanings)
         _uiState.update {
             it.copy(
                 study = StudyUiState(
@@ -232,7 +240,8 @@ class LearningViewModel @Inject constructor(
 
     private fun buildStudyCards(
         details: LearningBlockDetails,
-        mode: StudyMode
+        mode: StudyMode,
+        wordMeanings: Map<Long, List<String>> = emptyMap()
     ): List<StudyCard> {
         val wordCards = details.words.map { word ->
             StudyCard(
@@ -242,7 +251,7 @@ class LearningViewModel @Inject constructor(
                 answerTitle = word.writingForm,
                 answerSubtitle = word.readingKana,
                 readings = listOf(word.readingKana),
-                meanings = listOfNotNull(word.topicName),
+                meanings = wordMeanings[word.wordId].orEmpty(),
                 examples = listOfNotNull(
                     word.jlptLevel?.let { "Уровень: $it" }
                 ),
@@ -274,4 +283,47 @@ class LearningViewModel @Inject constructor(
             StudyMode.ALL -> wordCards + kanjiCards
         }
     }
+
+    private fun loadAndApplyWordMeanings(
+        blockId: Long,
+        mode: StudyMode,
+        details: LearningBlockDetails
+    ) {
+        if (details.words.isEmpty()) return
+
+        viewModelScope.launch {
+            val wordMeanings = fetchWordMeanings(details)
+            if (wordMeanings.isEmpty()) return@launch
+
+            val currentStudy = _uiState.value.study
+            if (currentStudy.blockId != blockId || currentStudy.mode != mode) return@launch
+
+            setStudyState(
+                blockId = blockId,
+                mode = mode,
+                details = details,
+                wordMeanings = wordMeanings
+            )
+        }
+    }
+
+    private suspend fun fetchWordMeanings(details: LearningBlockDetails): Map<Long, List<String>> =
+        coroutineScope {
+            details.words
+                .map { word ->
+                    async {
+                        val meanings = runCatching { getWordDetailsUseCase(word.wordId) }
+                            .getOrNull()
+                            ?.meanings
+                            ?.map { it.meaning.trim() }
+                            ?.filter { it.isNotBlank() }
+                            ?.distinct()
+                            .orEmpty()
+                        word.wordId to meanings
+                    }
+                }
+                .awaitAll()
+                .filter { it.second.isNotEmpty() }
+                .toMap()
+        }
 }

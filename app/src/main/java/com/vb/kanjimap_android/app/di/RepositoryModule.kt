@@ -1,5 +1,7 @@
 package com.vb.kanjimap_android.app.di
 
+import com.vb.kanjimap_android.feature.home.data.repository.HomeRepositoryImpl
+import com.vb.kanjimap_android.feature.home.domain.repository.HomeRepository
 import com.vb.kanjimap_android.feature.library.data.repository.LibraryRepositoryImpl
 import com.vb.kanjimap_android.feature.library.domain.repository.LibraryRepository
 import com.vb.kanjimap_android.feature.learning.data.repository.LearningRepositoryImpl
@@ -15,6 +17,12 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class RepositoryModule {
+
+    @Binds
+    @Singleton
+    abstract fun bindHomeRepository(
+        homeRepositoryImpl: HomeRepositoryImpl
+    ): HomeRepository
 
     @Binds
     @Singleton
