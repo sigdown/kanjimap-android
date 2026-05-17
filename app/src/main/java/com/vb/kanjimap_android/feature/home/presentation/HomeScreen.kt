@@ -7,19 +7,21 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
+import com.vb.kanjimap_android.core.ui.components.BodyText
 import com.vb.kanjimap_android.core.ui.components.ErrorView
 import com.vb.kanjimap_android.core.ui.components.LoadingView
+import com.vb.kanjimap_android.core.ui.components.MetaText
+import com.vb.kanjimap_android.core.ui.components.PrimaryButton
+import com.vb.kanjimap_android.core.ui.components.ScreenTitleText
+import com.vb.kanjimap_android.core.ui.components.SecondaryButton
+import com.vb.kanjimap_android.core.ui.components.SectionCard
+import com.vb.kanjimap_android.core.ui.components.SectionTitleText
 import com.vb.kanjimap_android.core.ui.theme.CoreSpacing
+import com.vb.kanjimap_android.core.ui.theme.Dimens
 import com.vb.kanjimap_android.feature.home.domain.model.HomeBlockPreview
 import com.vb.kanjimap_android.feature.home.domain.model.HomeSummary
 
@@ -42,7 +44,7 @@ fun HomeScreen(
                     message = uiState.errorMessage,
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(horizontal = CoreSpacing.lg),
+                        .padding(horizontal = Dimens.screenHorizontalPadding),
                     retryLabel = "Повторить",
                     onRetry = onRetry
                 )
@@ -70,20 +72,15 @@ private fun GuestHomeContent(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = CoreSpacing.lg, vertical = CoreSpacing.xl),
-        verticalArrangement = Arrangement.spacedBy(CoreSpacing.md)
+            .padding(Dimens.screenContentPadding),
+        verticalArrangement = Arrangement.spacedBy(Dimens.sectionSpacing)
     ) {
-        Text(
-            text = "Главная",
-            style = MaterialTheme.typography.headlineMedium,
-            fontWeight = FontWeight.SemiBold
-        )
-        Text(
+        ScreenTitleText("Главная")
+        MetaText(
             text = "Home — это персональная зона обучения с повторами и быстрым доступом к прогрессу.",
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            modifier = Modifier.fillMaxWidth()
         )
-        Button(onClick = onAuthClick) {
+        PrimaryButton(onClick = onAuthClick, modifier = Modifier.fillMaxWidth()) {
             Text("Авторизоваться")
         }
     }
@@ -100,26 +97,19 @@ private fun HomeSummaryContent(
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = CoreSpacing.lg, vertical = CoreSpacing.md),
-        verticalArrangement = Arrangement.spacedBy(CoreSpacing.md)
+            .padding(Dimens.screenContentPadding),
+        verticalArrangement = Arrangement.spacedBy(Dimens.sectionSpacing)
     ) {
         item {
-            Text(
-                text = "Привет, ${summary.username}",
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.SemiBold
-            )
+            ScreenTitleText("Привет, ${summary.username}")
         }
 
         item {
             HomeCard(title = "На сегодня") {
-                Text("Слова на повторение: ${summary.reviewWordsCount}")
-                Text("Кандзи на повторение: ${summary.reviewKanjiCount}")
-                Text(
-                    text = "Всего на сегодня: ${summary.totalReviewCount}",
-                    style = MaterialTheme.typography.titleMedium
-                )
-                Button(onClick = onOpenReview, modifier = Modifier.fillMaxWidth()) {
+                BodyText("Слова на повторение: ${summary.reviewWordsCount}")
+                BodyText("Кандзи на повторение: ${summary.reviewKanjiCount}")
+                SectionTitleText("Всего на сегодня: ${summary.totalReviewCount}")
+                PrimaryButton(onClick = onOpenReview, modifier = Modifier.fillMaxWidth()) {
                     Text("Начать повторение")
                 }
             }
@@ -128,16 +118,13 @@ private fun HomeSummaryContent(
         item {
             HomeCard(title = "Обучение") {
                 if (summary.blocksPreview.isEmpty()) {
-                    Text(
-                        text = "Пока нет доступных блоков.",
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                    MetaText("Пока нет доступных блоков.")
                 } else {
                     summary.blocksPreview.forEach { block ->
                         BlockPreviewItem(block = block)
                     }
                 }
-                OutlinedButton(onClick = onOpenBlocks, modifier = Modifier.fillMaxWidth()) {
+                SecondaryButton(onClick = onOpenBlocks, modifier = Modifier.fillMaxWidth()) {
                     Text("Открыть блоки")
                 }
             }
@@ -149,13 +136,13 @@ private fun HomeSummaryContent(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(CoreSpacing.sm)
                 ) {
-                    OutlinedButton(
+                    SecondaryButton(
                         onClick = onOpenWords,
                         modifier = Modifier.weight(1f)
                     ) {
                         Text("Слова")
                     }
-                    OutlinedButton(
+                    SecondaryButton(
                         onClick = onOpenKanji,
                         modifier = Modifier.weight(1f)
                     ) {
@@ -172,30 +159,10 @@ private fun HomeCard(
     title: String,
     content: @Composable () -> Unit
 ) {
-    Card(
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerLow
-        )
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(CoreSpacing.md),
-            verticalArrangement = Arrangement.spacedBy(CoreSpacing.sm)
-        ) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleLarge
-            )
-            content()
-        }
-    }
+    SectionCard(title = title) { content() }
 }
 
 @Composable
 private fun BlockPreviewItem(block: HomeBlockPreview) {
-    Text(
-        text = "• ${block.title} (${block.blockType})",
-        style = MaterialTheme.typography.bodyLarge
-    )
+    BodyText("• ${block.title} (${block.blockType})")
 }

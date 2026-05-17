@@ -13,15 +13,18 @@ import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
+import com.vb.kanjimap_android.core.ui.components.MetaText
+import com.vb.kanjimap_android.core.ui.components.SecondaryButton
+import com.vb.kanjimap_android.core.ui.components.SectionCard
+import com.vb.kanjimap_android.core.ui.components.SectionTitleText
 import com.vb.kanjimap_android.core.ui.theme.CoreSpacing
+import com.vb.kanjimap_android.core.ui.theme.Dimens
 import com.vb.kanjimap_android.feature.learning.domain.model.LearningBlock
 import com.vb.kanjimap_android.feature.learning.domain.model.StudyCard
 import com.vb.kanjimap_android.feature.learning.domain.model.StudyCardType
@@ -40,19 +43,16 @@ fun LearningEmptyState(
         contentAlignment = Alignment.Center
     ) {
         Column(
-            modifier = Modifier.padding(vertical = CoreSpacing.xl),
+            modifier = Modifier.padding(vertical = Dimens.emptyStateVerticalPadding),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(CoreSpacing.sm)
         ) {
-            Text(
+            SectionTitleText(
                 text = title,
-                style = MaterialTheme.typography.titleMedium,
                 textAlign = TextAlign.Center
             )
-            Text(
+            MetaText(
                 text = description,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center
             )
             action?.invoke()
@@ -66,23 +66,7 @@ fun LearningSectionCard(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerLow
-        )
-    ) {
-        Column(
-            modifier = Modifier.padding(CoreSpacing.md),
-            verticalArrangement = Arrangement.spacedBy(CoreSpacing.sm)
-        ) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleMedium
-            )
-            content()
-        }
-    }
+    SectionCard(title = title, modifier = modifier, content = content)
 }
 
 @Composable
@@ -95,12 +79,13 @@ fun LearningBlockListItem(
         modifier = modifier
             .fillMaxWidth()
             .clickable(onClick = onClick),
+        shape = Dimens.cardShape,
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainerLow
         )
     ) {
         Column(
-            modifier = Modifier.padding(CoreSpacing.md),
+            modifier = Modifier.padding(Dimens.cardContentPadding),
             verticalArrangement = Arrangement.spacedBy(CoreSpacing.xs)
         ) {
             Row(
@@ -119,17 +104,9 @@ fun LearningBlockListItem(
                 )
             }
             block.description?.let {
-                Text(
-                    text = it,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                MetaText(text = it)
             }
-            Text(
-                text = "Блок #${block.orderIndex + 1}",
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+            MetaText(text = "Блок #${block.orderIndex + 1}")
         }
     }
 }
@@ -149,17 +126,17 @@ fun StudyModeButtons(
         verticalArrangement = Arrangement.spacedBy(CoreSpacing.sm)
     ) {
         if (showWords) {
-            OutlinedButton(onClick = onWordsClick) {
+            SecondaryButton(onClick = onWordsClick, modifier = Modifier.fillMaxWidth()) {
                 Text("Изучать слова")
             }
         }
         if (showKanji) {
-            OutlinedButton(onClick = onKanjiClick) {
+            SecondaryButton(onClick = onKanjiClick, modifier = Modifier.fillMaxWidth()) {
                 Text("Изучать кандзи")
             }
         }
         if (showAll) {
-            OutlinedButton(onClick = onAllClick) {
+            SecondaryButton(onClick = onAllClick, modifier = Modifier.fillMaxWidth()) {
                 Text("Изучать всё")
             }
         }
@@ -208,14 +185,15 @@ fun StudyCardView(
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
+        shape = Dimens.cardShape,
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainerLow
         )
     ) {
         Column(
-            modifier = Modifier.padding(CoreSpacing.lg),
+            modifier = Modifier.padding(Dimens.cardContentPadding),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(CoreSpacing.md)
+            verticalArrangement = Arrangement.spacedBy(Dimens.sectionSpacing)
         ) {
             Text(
                 text = if (card.type == StudyCardType.WORD) "Слово" else "Кандзи",

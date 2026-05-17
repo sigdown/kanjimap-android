@@ -27,7 +27,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import com.vb.kanjimap_android.core.ui.components.MetaText
+import com.vb.kanjimap_android.core.ui.components.SectionCard
+import com.vb.kanjimap_android.core.ui.components.SectionTitleText
 import com.vb.kanjimap_android.core.ui.theme.CoreSpacing
+import com.vb.kanjimap_android.core.ui.theme.Dimens
 import com.vb.kanjimap_android.feature.library.domain.model.Kanji
 import com.vb.kanjimap_android.feature.library.domain.model.Word
 
@@ -69,23 +73,7 @@ fun LibrarySectionCard(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerLow
-        )
-    ) {
-        Column(
-            modifier = Modifier.padding(CoreSpacing.md),
-            verticalArrangement = Arrangement.spacedBy(CoreSpacing.sm)
-        ) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleMedium
-            )
-            content()
-        }
-    }
+    SectionCard(title = title, modifier = modifier, content = content)
 }
 
 @Composable
@@ -99,19 +87,12 @@ fun LibraryEmptyState(
         contentAlignment = Alignment.Center
     ) {
         Column(
-            modifier = Modifier.padding(vertical = 48.dp),
+            modifier = Modifier.padding(vertical = Dimens.emptyStateVerticalPadding),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(CoreSpacing.xs)
         ) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleMedium
-            )
-            Text(
-                text = description,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+            SectionTitleText(text = title)
+            MetaText(text = description)
         }
     }
 }
@@ -126,23 +107,17 @@ fun WordListItem(
         modifier = modifier
             .fillMaxWidth()
             .clickable(onClick = onClick),
+        shape = Dimens.cardShape,
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainerLow
         )
     ) {
         Column(
-            modifier = Modifier.padding(CoreSpacing.md),
+            modifier = Modifier.padding(Dimens.cardContentPadding),
             verticalArrangement = Arrangement.spacedBy(CoreSpacing.xs)
         ) {
-            Text(
-                text = word.writingForm,
-                style = MaterialTheme.typography.titleMedium
-            )
-            Text(
-                text = word.readingKana,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+            SectionTitleText(text = word.writingForm)
+            MetaText(text = word.readingKana)
             WordMetaRow(
                 jlptLevel = word.jlptLevel,
                 topicName = word.topicName
@@ -161,12 +136,13 @@ fun KanjiListItem(
         modifier = modifier
             .fillMaxWidth()
             .clickable(onClick = onClick),
+        shape = Dimens.cardShape,
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainerLow
         )
     ) {
         Row(
-            modifier = Modifier.padding(CoreSpacing.md),
+            modifier = Modifier.padding(Dimens.cardContentPadding),
             horizontalArrangement = Arrangement.spacedBy(CoreSpacing.md),
             verticalAlignment = Alignment.CenterVertically
         ) {

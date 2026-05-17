@@ -11,15 +11,19 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import com.vb.kanjimap_android.core.ui.components.BodyText
 import com.vb.kanjimap_android.core.ui.components.ErrorView
 import com.vb.kanjimap_android.core.ui.components.LoadingView
+import com.vb.kanjimap_android.core.ui.components.MetaText
+import com.vb.kanjimap_android.core.ui.components.PrimaryButton
+import com.vb.kanjimap_android.core.ui.components.ScreenTitleText
+import com.vb.kanjimap_android.core.ui.components.SectionTitleText
 import com.vb.kanjimap_android.core.ui.theme.CoreSpacing
+import com.vb.kanjimap_android.core.ui.theme.Dimens
 import com.vb.kanjimap_android.feature.library.presentation.components.KanjisRow
 import com.vb.kanjimap_android.feature.library.presentation.components.LibraryEmptyState
 import com.vb.kanjimap_android.feature.library.presentation.components.LibrarySectionCard
@@ -42,7 +46,7 @@ fun WordDetailsScreen(
                     message = uiState.errorMessage,
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(horizontal = CoreSpacing.lg),
+                        .padding(horizontal = Dimens.screenHorizontalPadding),
                     retryLabel = "Повторить",
                     onRetry = onRetry
                 )
@@ -54,7 +58,7 @@ fun WordDetailsScreen(
                     description = "Детали слова пока недоступны.",
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(horizontal = CoreSpacing.lg)
+                        .padding(horizontal = Dimens.screenHorizontalPadding)
                 )
             }
 
@@ -65,35 +69,24 @@ fun WordDetailsScreen(
                         .fillMaxSize()
                         .statusBarsPadding()
                         .navigationBarsPadding()
-                        .padding(horizontal = CoreSpacing.lg, vertical = CoreSpacing.md),
-                    verticalArrangement = Arrangement.spacedBy(CoreSpacing.md)
+                        .padding(Dimens.screenContentPadding),
+                    verticalArrangement = Arrangement.spacedBy(Dimens.sectionSpacing)
                 ) {
                     item {
                         Column(
                             verticalArrangement = Arrangement.spacedBy(CoreSpacing.xs)
                         ) {
-                            Text(
-                                text = details.word.writingForm,
-                                style = MaterialTheme.typography.headlineMedium
-                            )
-                            Text(
-                                text = details.word.readingKana,
-                                style = MaterialTheme.typography.titleMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
+                            ScreenTitleText(details.word.writingForm)
+                            MetaText(details.word.readingKana)
                             val meta = listOfNotNull(details.word.jlptLevel, details.word.topicName)
                             if (meta.isNotEmpty()) {
-                                Text(
-                                    text = meta.joinToString(" • "),
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
+                                MetaText(meta.joinToString(" • "))
                             }
                         }
                     }
 
                     item {
-                        Button(
+                        PrimaryButton(
                             onClick = onSaveClick,
                             modifier = Modifier.fillMaxWidth()
                         ) {
@@ -106,29 +99,15 @@ fun WordDetailsScreen(
                             Column(verticalArrangement = Arrangement.spacedBy(CoreSpacing.md)) {
                                 details.meanings.forEachIndexed { index, meaning ->
                                     Column(verticalArrangement = Arrangement.spacedBy(CoreSpacing.xs)) {
-                                        Text(
-                                            text = "${index + 1}. ${meaning.meaning}",
-                                            style = MaterialTheme.typography.bodyLarge
-                                        )
+                                        BodyText("${index + 1}. ${meaning.meaning}")
                                         meaning.partOfSpeech?.let {
-                                            Text(
-                                                text = it,
-                                                style = MaterialTheme.typography.labelLarge,
-                                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                                            )
+                                            MetaText(it)
                                         }
                                         meaning.exampleJp?.let {
-                                            Text(
-                                                text = it,
-                                                style = MaterialTheme.typography.bodyMedium
-                                            )
+                                            BodyText(it)
                                         }
                                         meaning.exampleTranslation?.let {
-                                            Text(
-                                                text = it,
-                                                style = MaterialTheme.typography.bodyMedium,
-                                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                                            )
+                                            MetaText(it)
                                         }
                                     }
                                 }
@@ -139,10 +118,7 @@ fun WordDetailsScreen(
                     item {
                         LibrarySectionCard(title = "Кандзи в слове") {
                             if (details.kanjis.isEmpty()) {
-                                Text(
-                                    text = "Для этого слова кандзи не указаны.",
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
+                                MetaText("Для этого слова кандзи не указаны.")
                             } else {
                                 KanjisRow(
                                     kanjis = details.kanjis,
@@ -155,24 +131,14 @@ fun WordDetailsScreen(
                     item {
                         LibrarySectionCard(title = "Связанные слова") {
                             if (details.relatedWords.isEmpty()) {
-                                Text(
-                                    text = "Связанных слов пока нет.",
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
+                                MetaText("Связанных слов пока нет.")
                             } else {
                                 Column(verticalArrangement = Arrangement.spacedBy(CoreSpacing.md)) {
                                     details.relatedWords.forEach { relatedWord ->
                                         Column(verticalArrangement = Arrangement.spacedBy(CoreSpacing.xs)) {
-                                            Text(
-                                                text = relatedWord.relationType,
-                                                style = MaterialTheme.typography.titleSmall
-                                            )
+                                            SectionTitleText(relatedWord.relationType)
                                             relatedWord.note?.let {
-                                                Text(
-                                                    text = it,
-                                                    style = MaterialTheme.typography.bodyMedium,
-                                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                                )
+                                                MetaText(it)
                                             }
                                             relatedWord.word?.let { word ->
                                                 RelatedWordsColumn(

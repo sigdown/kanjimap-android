@@ -10,15 +10,18 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import com.vb.kanjimap_android.core.ui.components.BodyText
 import com.vb.kanjimap_android.core.ui.components.ErrorView
 import com.vb.kanjimap_android.core.ui.components.LoadingView
+import com.vb.kanjimap_android.core.ui.components.MetaText
+import com.vb.kanjimap_android.core.ui.components.PrimaryButton
+import com.vb.kanjimap_android.core.ui.components.ScreenTitleText
 import com.vb.kanjimap_android.core.ui.theme.CoreSpacing
+import com.vb.kanjimap_android.core.ui.theme.Dimens
 import com.vb.kanjimap_android.feature.library.presentation.components.LibraryEmptyState
 import com.vb.kanjimap_android.feature.library.presentation.components.LibrarySectionCard
 import com.vb.kanjimap_android.feature.library.presentation.components.RelatedWordsColumn
@@ -39,7 +42,7 @@ fun KanjiDetailsScreen(
                     message = uiState.errorMessage,
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(horizontal = CoreSpacing.lg),
+                        .padding(horizontal = Dimens.screenHorizontalPadding),
                     retryLabel = "Повторить",
                     onRetry = onRetry
                 )
@@ -51,7 +54,7 @@ fun KanjiDetailsScreen(
                     description = "Детали кандзи пока недоступны.",
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(horizontal = CoreSpacing.lg)
+                        .padding(horizontal = Dimens.screenHorizontalPadding)
                 )
             }
 
@@ -62,18 +65,15 @@ fun KanjiDetailsScreen(
                         .fillMaxSize()
                         .statusBarsPadding()
                         .navigationBarsPadding()
-                        .padding(horizontal = CoreSpacing.lg, vertical = CoreSpacing.md),
-                    verticalArrangement = Arrangement.spacedBy(CoreSpacing.md)
+                        .padding(Dimens.screenContentPadding),
+                    verticalArrangement = Arrangement.spacedBy(Dimens.sectionSpacing)
                 ) {
                     item {
                         Column(
                             verticalArrangement = Arrangement.spacedBy(CoreSpacing.xs)
                         ) {
-                            Text(
-                                text = details.kanji.literal,
-                                style = MaterialTheme.typography.displaySmall
-                            )
-                            Text(
+                            ScreenTitleText(details.kanji.literal)
+                            MetaText(
                                 text = buildString {
                                     append("ID ")
                                     append(details.kanji.kanjiId)
@@ -86,15 +86,13 @@ fun KanjiDetailsScreen(
                                         append(" • ")
                                         append(it)
                                     }
-                                },
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                }
                             )
                         }
                     }
 
                     item {
-                        Button(
+                        PrimaryButton(
                             onClick = onSaveClick,
                             modifier = Modifier.fillMaxWidth()
                         ) {
@@ -105,29 +103,15 @@ fun KanjiDetailsScreen(
                     item {
                         LibrarySectionCard(title = "Значения") {
                             if (details.meanings.isEmpty()) {
-                                Text(
-                                    text = "Значения пока не указаны.",
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
+                                MetaText("Значения пока не указаны.")
                             } else {
                                 Column(verticalArrangement = Arrangement.spacedBy(CoreSpacing.md)) {
                                     details.meanings.forEach { meaning ->
                                         Column(verticalArrangement = Arrangement.spacedBy(CoreSpacing.xs)) {
-                                            Text(
-                                                text = meaning.meaning,
-                                                style = MaterialTheme.typography.bodyLarge
-                                            )
-                                            Text(
-                                                text = meaning.languageCode.uppercase(),
-                                                style = MaterialTheme.typography.labelLarge,
-                                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                                            )
+                                            BodyText(meaning.meaning)
+                                            MetaText(meaning.languageCode.uppercase())
                                             meaning.example?.let {
-                                                Text(
-                                                    text = it,
-                                                    style = MaterialTheme.typography.bodyMedium,
-                                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                                )
+                                                MetaText(it)
                                             }
                                         }
                                     }
@@ -157,10 +141,7 @@ fun KanjiDetailsScreen(
                     item {
                         LibrarySectionCard(title = "Слова с этим кандзи") {
                             if (details.words.isEmpty()) {
-                                Text(
-                                    text = "Слова пока не указаны.",
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
+                                MetaText("Слова пока не указаны.")
                             } else {
                                 RelatedWordsColumn(
                                     words = details.words,
@@ -180,15 +161,9 @@ fun KanjiDetailsScreen(
 @Composable
 private fun ReadingContent(readings: List<String>) {
     if (readings.isEmpty()) {
-        Text(
-            text = "Нет данных",
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
+        MetaText("Нет данных")
         return
     }
 
-    Text(
-        text = readings.joinToString(" • "),
-        style = MaterialTheme.typography.bodyLarge
-    )
+    BodyText(readings.joinToString(" • "))
 }

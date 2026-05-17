@@ -7,18 +7,21 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
+import com.vb.kanjimap_android.core.ui.components.BodyText
 import com.vb.kanjimap_android.core.ui.components.ErrorView
 import com.vb.kanjimap_android.core.ui.components.LoadingView
-import com.vb.kanjimap_android.core.ui.theme.CoreSpacing
+import com.vb.kanjimap_android.core.ui.components.MetaText
+import com.vb.kanjimap_android.core.ui.components.PrimaryButton
+import com.vb.kanjimap_android.core.ui.components.ScreenTitleText
+import com.vb.kanjimap_android.core.ui.components.SecondaryButton
+import com.vb.kanjimap_android.core.ui.components.SectionCard
+import com.vb.kanjimap_android.core.ui.components.SectionTitleText
+import com.vb.kanjimap_android.core.ui.theme.Dimens
 import com.vb.kanjimap_android.feature.review.domain.model.ReviewItem
 import com.vb.kanjimap_android.feature.review.domain.model.ReviewItemType
 import com.vb.kanjimap_android.feature.review.domain.model.ReviewResult
@@ -46,7 +49,7 @@ fun ReviewScreen(
                 onRetry = onRetry,
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = CoreSpacing.lg)
+                    .padding(horizontal = Dimens.screenHorizontalPadding)
             )
             uiState.isCompleted -> CompletedState(onGoHome = onGoHome, onClose = onClose)
             uiState.isEmpty -> EmptyState(onGoHome = onGoHome)
@@ -73,17 +76,16 @@ private fun GuestState(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(CoreSpacing.lg),
-        verticalArrangement = Arrangement.spacedBy(CoreSpacing.md)
+            .padding(Dimens.screenContentPadding),
+        verticalArrangement = Arrangement.spacedBy(Dimens.sectionSpacing)
     ) {
-        Text("Повторение", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.SemiBold)
-        Text(
+        ScreenTitleText("Повторение")
+        MetaText(
             text = "Повторение доступно после входа в аккаунт.",
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            modifier = Modifier.fillMaxWidth()
         )
-        Button(onClick = onAuthClick) { Text("Авторизоваться") }
-        OutlinedButton(onClick = onClose) { Text("Закрыть") }
+        PrimaryButton(onClick = onAuthClick, modifier = Modifier.fillMaxWidth()) { Text("Авторизоваться") }
+        SecondaryButton(onClick = onClose, modifier = Modifier.fillMaxWidth()) { Text("Закрыть") }
     }
 }
 
@@ -92,11 +94,11 @@ private fun EmptyState(onGoHome: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(CoreSpacing.lg),
-        verticalArrangement = Arrangement.spacedBy(CoreSpacing.md)
+            .padding(Dimens.screenContentPadding),
+        verticalArrangement = Arrangement.spacedBy(Dimens.sectionSpacing)
     ) {
-        Text("На сегодня повторений нет", style = MaterialTheme.typography.headlineSmall)
-        Button(onClick = onGoHome) { Text("На главную") }
+        ScreenTitleText("На сегодня повторений нет")
+        PrimaryButton(onClick = onGoHome, modifier = Modifier.fillMaxWidth()) { Text("На главную") }
     }
 }
 
@@ -108,12 +110,12 @@ private fun CompletedState(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(CoreSpacing.lg),
-        verticalArrangement = Arrangement.spacedBy(CoreSpacing.md)
+            .padding(Dimens.screenContentPadding),
+        verticalArrangement = Arrangement.spacedBy(Dimens.sectionSpacing)
     ) {
-        Text("Повторение завершено", style = MaterialTheme.typography.headlineSmall)
-        Button(onClick = onGoHome) { Text("На главную") }
-        OutlinedButton(onClick = onClose) { Text("Закрыть") }
+        ScreenTitleText("Повторение завершено")
+        PrimaryButton(onClick = onGoHome, modifier = Modifier.fillMaxWidth()) { Text("На главную") }
+        SecondaryButton(onClick = onClose, modifier = Modifier.fillMaxWidth()) { Text("Закрыть") }
     }
 }
 
@@ -130,31 +132,32 @@ private fun ReviewCardState(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .padding(CoreSpacing.lg),
-        verticalArrangement = Arrangement.spacedBy(CoreSpacing.md)
+            .padding(Dimens.screenContentPadding),
+        verticalArrangement = Arrangement.spacedBy(Dimens.sectionSpacing)
     ) {
-        Text(uiState.progressText, style = MaterialTheme.typography.titleMedium)
-        Text(
+        MetaText(uiState.progressText)
+        ScreenTitleText(
             text = when (item.itemType) {
                 ReviewItemType.WORD -> item.word?.writingForm ?: "Слово"
                 ReviewItemType.KANJI -> item.kanji?.literal ?: "Кандзи"
-            },
-            style = MaterialTheme.typography.displaySmall
+            }
         )
 
         if (uiState.isAnswerRevealed) {
-            when (item.itemType) {
-                ReviewItemType.WORD -> {
-                    Text("Чтение: ${item.word?.readingKana.orEmpty()}")
-                    item.word?.topicName?.let { Text("Тема: $it") }
-                }
-                ReviewItemType.KANJI -> {
-                    item.kanji?.strokeCount?.let { Text("Черт: $it") }
-                    item.kanji?.jlptLevel?.let { Text("JLPT: $it") }
+            SectionCard(title = "Подсказки") {
+                when (item.itemType) {
+                    ReviewItemType.WORD -> {
+                        BodyText("Чтение: ${item.word?.readingKana.orEmpty()}")
+                        item.word?.topicName?.let { MetaText("Тема: $it") }
+                    }
+                    ReviewItemType.KANJI -> {
+                        item.kanji?.strokeCount?.let { MetaText("Черт: $it") }
+                        item.kanji?.jlptLevel?.let { MetaText("JLPT: $it") }
+                    }
                 }
             }
         } else {
-            Button(
+            PrimaryButton(
                 onClick = onShowAnswer,
                 modifier = Modifier.fillMaxWidth()
             ) { Text("Показать ответ") }
@@ -169,7 +172,7 @@ private fun ReviewCardState(
         )
 
         if (uiState.result == null) {
-            Button(
+            PrimaryButton(
                 onClick = onSubmitAnswer,
                 modifier = Modifier.fillMaxWidth(),
                 enabled = uiState.answerInput.isNotBlank() && !uiState.isSubmitting
@@ -190,19 +193,12 @@ private fun ResultBlock(
     result: ReviewResult,
     onNextCard: () -> Unit
 ) {
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(CoreSpacing.sm)
-    ) {
-        Text(
-            text = if (result.isCorrect) "Правильно" else "Неправильно",
-            color = if (result.isCorrect) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
-            style = MaterialTheme.typography.titleLarge
-        )
-        Text("acceptedAnswers: ${result.acceptedAnswers.joinToString()}")
-        Text("status: ${result.status}")
-        Text("nextReviewAt: ${result.nextReviewAt ?: "-"}")
-        Button(onClick = onNextCard, modifier = Modifier.fillMaxWidth()) {
+    SectionCard(title = if (result.isCorrect) "Правильно" else "Неправильно") {
+        SectionTitleText(if (result.isCorrect) "Ответ принят" else "Ответ не принят")
+        MetaText("acceptedAnswers: ${result.acceptedAnswers.joinToString()}")
+        MetaText("status: ${result.status}")
+        MetaText("nextReviewAt: ${result.nextReviewAt ?: "-"}")
+        PrimaryButton(onClick = onNextCard, modifier = Modifier.fillMaxWidth()) {
             Text("Следующая карточка")
         }
     }

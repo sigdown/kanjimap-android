@@ -8,14 +8,16 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import com.vb.kanjimap_android.core.ui.components.BodyText
 import com.vb.kanjimap_android.core.ui.components.ErrorView
 import com.vb.kanjimap_android.core.ui.components.LoadingView
+import com.vb.kanjimap_android.core.ui.components.MetaText
+import com.vb.kanjimap_android.core.ui.components.ScreenTitleText
 import com.vb.kanjimap_android.core.ui.theme.CoreSpacing
+import com.vb.kanjimap_android.core.ui.theme.Dimens
 import com.vb.kanjimap_android.feature.learning.presentation.components.KanjiChips
 import com.vb.kanjimap_android.feature.learning.presentation.components.LearningEmptyState
 import com.vb.kanjimap_android.feature.learning.presentation.components.LearningSectionCard
@@ -39,7 +41,7 @@ fun BlockDetailsScreen(
                     message = uiState.errorMessage,
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(horizontal = CoreSpacing.lg),
+                        .padding(horizontal = Dimens.screenHorizontalPadding),
                     retryLabel = "Повторить",
                     onRetry = onRetry
                 )
@@ -51,7 +53,7 @@ fun BlockDetailsScreen(
                     description = "Попробуйте открыть блок позже.",
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(horizontal = CoreSpacing.lg)
+                        .padding(horizontal = Dimens.screenHorizontalPadding)
                 )
             }
 
@@ -66,29 +68,19 @@ fun BlockDetailsScreen(
                         .fillMaxSize()
                         .statusBarsPadding()
                         .navigationBarsPadding()
-                        .padding(horizontal = CoreSpacing.lg, vertical = CoreSpacing.md),
-                    verticalArrangement = Arrangement.spacedBy(CoreSpacing.md)
+                        .padding(Dimens.screenContentPadding),
+                    verticalArrangement = Arrangement.spacedBy(Dimens.sectionSpacing)
                 ) {
                     item {
-                        Text(
-                            text = details.block.title,
-                            style = MaterialTheme.typography.headlineMedium
-                        )
+                        ScreenTitleText(details.block.title)
                     }
 
                     item {
                         LearningSectionCard(title = "О блоке") {
                             details.block.description?.let {
-                                Text(
-                                    text = it,
-                                    style = MaterialTheme.typography.bodyLarge
-                                )
+                                BodyText(it)
                             }
-                            Text(
-                                text = "Тип: ${details.block.blockType}",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
+                            MetaText("Тип: ${details.block.blockType}")
                         }
                     }
 
@@ -106,10 +98,7 @@ fun BlockDetailsScreen(
                     item {
                         LearningSectionCard(title = "Слова") {
                             if (details.words.isEmpty()) {
-                                Text(
-                                    text = "Слова в этом блоке пока не добавлены.",
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
+                                MetaText("Слова в этом блоке пока не добавлены.")
                             } else {
                                 WordsChips(words = details.words)
                             }
@@ -119,10 +108,7 @@ fun BlockDetailsScreen(
                     item {
                         LearningSectionCard(title = "Кандзи") {
                             if (details.kanjis.isEmpty()) {
-                                Text(
-                                    text = "Кандзи в этом блоке пока не добавлены.",
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
+                                MetaText("Кандзи в этом блоке пока не добавлены.")
                             } else {
                                 KanjiChips(kanjis = details.kanjis)
                             }

@@ -8,9 +8,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -18,7 +15,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.vb.kanjimap_android.core.ui.components.ErrorView
 import com.vb.kanjimap_android.core.ui.components.LoadingView
+import com.vb.kanjimap_android.core.ui.components.MetaText
+import com.vb.kanjimap_android.core.ui.components.PrimaryButton
+import com.vb.kanjimap_android.core.ui.components.SecondaryButton
 import com.vb.kanjimap_android.core.ui.theme.CoreSpacing
+import com.vb.kanjimap_android.core.ui.theme.Dimens
 import com.vb.kanjimap_android.feature.learning.presentation.components.LearningEmptyState
 import com.vb.kanjimap_android.feature.learning.presentation.components.StudyCardView
 
@@ -41,7 +42,7 @@ fun StudyScreen(
                     message = uiState.errorMessage,
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(horizontal = CoreSpacing.lg),
+                        .padding(horizontal = Dimens.screenHorizontalPadding),
                     retryLabel = "Повторить",
                     onRetry = onRetry
                 )
@@ -53,7 +54,7 @@ fun StudyScreen(
                     description = "Для выбранного режима обучения ничего не найдено.",
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(horizontal = CoreSpacing.lg)
+                        .padding(horizontal = Dimens.screenHorizontalPadding)
                 )
             }
 
@@ -64,15 +65,11 @@ fun StudyScreen(
                         .fillMaxSize()
                         .statusBarsPadding()
                         .navigationBarsPadding()
-                        .padding(horizontal = CoreSpacing.lg, vertical = CoreSpacing.md),
+                        .padding(Dimens.screenContentPadding),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(CoreSpacing.lg)
+                    verticalArrangement = Arrangement.spacedBy(Dimens.sectionSpacing)
                 ) {
-                    Text(
-                        text = uiState.progressText,
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                    MetaText(text = uiState.progressText)
 
                     StudyCardView(
                         card = currentCard,
@@ -82,9 +79,9 @@ fun StudyScreen(
 
                     Column(
                         modifier = Modifier.fillMaxWidth(),
-                        verticalArrangement = Arrangement.spacedBy(CoreSpacing.sm)
+                        verticalArrangement = Arrangement.spacedBy(Dimens.cardInnerSpacing)
                     ) {
-                        Button(
+                        PrimaryButton(
                             onClick = onShowAnswer,
                             modifier = Modifier.fillMaxWidth(),
                             enabled = !uiState.isAnswerRevealed && !uiState.isSubmittingProgress
@@ -92,7 +89,7 @@ fun StudyScreen(
                             Text("Показать ответ")
                         }
 
-                        OutlinedButton(
+                        SecondaryButton(
                             onClick = onPreviousClick,
                             modifier = Modifier.fillMaxWidth(),
                             enabled = uiState.currentIndex > 0 && !uiState.isSubmittingProgress
@@ -100,7 +97,7 @@ fun StudyScreen(
                             Text("Назад")
                         }
 
-                        Button(
+                        PrimaryButton(
                             onClick = onNextClick,
                             modifier = Modifier.fillMaxWidth(),
                             enabled = uiState.currentIndex < uiState.cards.lastIndex &&
@@ -113,14 +110,14 @@ fun StudyScreen(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.spacedBy(CoreSpacing.sm)
                         ) {
-                            OutlinedButton(
+                            SecondaryButton(
                                 onClick = onUnknownClick,
                                 modifier = Modifier.weight(1f),
                                 enabled = uiState.isAnswerRevealed && !uiState.isSubmittingProgress
                             ) {
                                 Text("Не знал")
                             }
-                            Button(
+                            PrimaryButton(
                                 onClick = onKnownClick,
                                 modifier = Modifier.weight(1f),
                                 enabled = uiState.isAnswerRevealed && !uiState.isSubmittingProgress
@@ -130,11 +127,7 @@ fun StudyScreen(
                         }
 
                         if (uiState.submitErrorMessage != null) {
-                            Text(
-                                text = uiState.submitErrorMessage,
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.error
-                            )
+                            MetaText(text = uiState.submitErrorMessage)
                         }
                     }
                 }

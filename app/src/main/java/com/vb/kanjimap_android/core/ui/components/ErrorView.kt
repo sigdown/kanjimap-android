@@ -3,11 +3,10 @@ package com.vb.kanjimap_android.core.ui.components
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.vb.kanjimap_android.core.ui.theme.Dimens
 
 @Composable
 fun ErrorView(
@@ -19,12 +18,12 @@ fun ErrorView(
     Column(
         modifier = modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.spacedBy(Dimens.sectionSpacing, Alignment.CenterVertically)
     ) {
-        Text(text = message)
+        MetaText(text = message)
         if (onRetry != null) {
-            Button(onClick = onRetry) {
-                Text(text = retryLabel)
+            PrimaryButton(onClick = onRetry) {
+                androidx.compose.material3.Text(text = retryLabel)
             }
         }
     }

@@ -9,14 +9,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.vb.kanjimap_android.core.ui.components.ErrorView
 import com.vb.kanjimap_android.core.ui.components.LoadingView
 import com.vb.kanjimap_android.core.ui.theme.CoreSpacing
+import com.vb.kanjimap_android.core.ui.components.ScreenTitleText
+import com.vb.kanjimap_android.core.ui.theme.Dimens
 import com.vb.kanjimap_android.feature.library.presentation.components.KanjiListItem
 import com.vb.kanjimap_android.feature.library.presentation.components.LibraryEmptyState
 import com.vb.kanjimap_android.feature.library.presentation.components.LibrarySearchField
@@ -35,14 +35,11 @@ fun KanjiScreen(
                 .fillMaxSize()
                 .statusBarsPadding()
                 .navigationBarsPadding()
-                .padding(horizontal = CoreSpacing.lg, vertical = CoreSpacing.md),
-            verticalArrangement = Arrangement.spacedBy(CoreSpacing.md)
+                .padding(Dimens.screenContentPadding),
+            verticalArrangement = Arrangement.spacedBy(Dimens.sectionSpacing)
         ) {
             item {
-                Text(
-                    text = "Кандзи",
-                    style = MaterialTheme.typography.headlineMedium
-                )
+                ScreenTitleText("Кандзи")
             }
 
             item {

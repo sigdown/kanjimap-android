@@ -9,15 +9,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.vb.kanjimap_android.core.ui.components.ErrorView
 import com.vb.kanjimap_android.core.ui.components.LoadingView
+import com.vb.kanjimap_android.core.ui.components.PrimaryButton
+import com.vb.kanjimap_android.core.ui.components.ScreenTitleText
 import com.vb.kanjimap_android.core.ui.theme.CoreSpacing
+import com.vb.kanjimap_android.core.ui.theme.Dimens
 import com.vb.kanjimap_android.feature.learning.presentation.components.LearningBlockListItem
 import com.vb.kanjimap_android.feature.learning.presentation.components.LearningEmptyState
 
@@ -36,14 +37,11 @@ fun LearnScreen(
                 .fillMaxSize()
                 .statusBarsPadding()
                 .navigationBarsPadding()
-                .padding(horizontal = CoreSpacing.lg, vertical = CoreSpacing.md),
-            verticalArrangement = Arrangement.spacedBy(CoreSpacing.md)
+                .padding(Dimens.screenContentPadding),
+            verticalArrangement = Arrangement.spacedBy(Dimens.sectionSpacing)
         ) {
             item {
-                Text(
-                    text = "Обучение",
-                    style = MaterialTheme.typography.headlineMedium
-                )
+                ScreenTitleText("Обучение")
             }
 
             if (!isAuthenticated) {
@@ -52,7 +50,7 @@ fun LearnScreen(
                         title = "Войдите, чтобы открыть обучение",
                         description = "После авторизации здесь появятся блоки и режим изучения карточками.",
                         action = {
-                            Button(onClick = onAuthClick) {
+                            PrimaryButton(onClick = onAuthClick) {
                                 Text("Авторизоваться")
                             }
                         }

@@ -2,17 +2,15 @@ package com.vb.kanjimap_android.feature.session.presentation
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -31,7 +29,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import com.vb.kanjimap_android.core.ui.theme.CoreSpacing
+import com.vb.kanjimap_android.core.ui.components.MetaText
+import com.vb.kanjimap_android.core.ui.components.PrimaryButton
+import com.vb.kanjimap_android.core.ui.components.ScreenTitleText
+import com.vb.kanjimap_android.core.ui.theme.Dimens
 import com.vb.kanjimap_android.ui.theme.KanjimapandroidTheme
 
 @Composable
@@ -66,21 +67,19 @@ fun AuthScreen(
                     .statusBarsPadding()
                     .navigationBarsPadding()
                     .verticalScroll(scrollState)
-                    .padding(horizontal = CoreSpacing.lg, vertical = CoreSpacing.md)
+                    .padding(Dimens.screenContentPadding),
+                verticalArrangement = Arrangement.spacedBy(Dimens.sectionSpacing)
             ) {
-                Text(
-                    text = if (isRegisterMode) "Регистрация" else "Авторизация",
-                    style = MaterialTheme.typography.headlineMedium
+                ScreenTitleText(
+                    text = if (isRegisterMode) "Регистрация" else "Авторизация"
                 )
-
-                Spacer(modifier = Modifier.height(CoreSpacing.md))
 
                 Column(
                     modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(Dimens.sectionSpacing)
                 ) {
                     if (uiState.errorMessage != null) {
                         ErrorMessage(message = uiState.errorMessage)
-                        Spacer(modifier = Modifier.height(CoreSpacing.md))
                     }
 
                     if (isRegisterMode) {
@@ -93,8 +92,6 @@ fun AuthScreen(
                             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                             modifier = Modifier.fillMaxWidth()
                         )
-
-                        Spacer(modifier = Modifier.height(CoreSpacing.md))
                     }
 
                     OutlinedTextField(
@@ -116,8 +113,6 @@ fun AuthScreen(
                         modifier = Modifier.fillMaxWidth()
                     )
 
-                    Spacer(modifier = Modifier.height(CoreSpacing.md))
-
                     OutlinedTextField(
                         value = password,
                         onValueChange = { password = it },
@@ -132,9 +127,7 @@ fun AuthScreen(
                         modifier = Modifier.fillMaxWidth()
                     )
 
-                    Spacer(modifier = Modifier.height(CoreSpacing.md))
-
-                    Button(
+                    PrimaryButton(
                         onClick = {
                             if (isRegisterMode) {
                                 onRegister(username.trim(), email.trim(), password)
@@ -153,8 +146,6 @@ fun AuthScreen(
                     ) {
                         Text(if (isRegisterMode) "Зарегистрироваться" else "Войти")
                     }
-
-                    Spacer(modifier = Modifier.height(CoreSpacing.sm))
 
                     TextButton(
                         onClick = {
@@ -186,10 +177,10 @@ fun AuthScreen(
 
 @Composable
 private fun ErrorMessage(message: String) {
-    Text(
+    MetaText(
         text = message,
-        color = MaterialTheme.colorScheme.error,
-        style = MaterialTheme.typography.bodyMedium
+        modifier = Modifier.fillMaxWidth(),
+        color = MaterialTheme.colorScheme.error
     )
 }
 

@@ -4,14 +4,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.style.TextAlign
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -19,6 +17,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.vb.kanjimap_android.core.ui.components.MetaText
+import com.vb.kanjimap_android.core.ui.components.PrimaryButton
+import com.vb.kanjimap_android.core.ui.components.ScreenTitleText
+import com.vb.kanjimap_android.core.ui.components.SecondaryButton
+import com.vb.kanjimap_android.core.ui.theme.Dimens
 import com.vb.kanjimap_android.feature.home.presentation.HomeRoute
 import com.vb.kanjimap_android.feature.learning.presentation.BlockDetailsRoute
 import com.vb.kanjimap_android.feature.learning.presentation.LearnRoute
@@ -197,10 +200,10 @@ private fun GuestCapableScreen(
         title = title,
         description = description
     ) {
-        Button(onClick = onPrimaryAction) {
+        PrimaryButton(onClick = onPrimaryAction, modifier = Modifier.fillMaxWidth()) {
             Text(primaryActionLabel)
         }
-        Button(onClick = onSecondaryAction) {
+        SecondaryButton(onClick = onSecondaryAction, modifier = Modifier.fillMaxWidth()) {
             Text(secondaryActionLabel)
         }
     }
@@ -218,7 +221,7 @@ private fun PlaceholderScreen(
         description = description
     ) {
         if (primaryActionLabel != null && onPrimaryAction != null) {
-            Button(onClick = onPrimaryAction) {
+            PrimaryButton(onClick = onPrimaryAction, modifier = Modifier.fillMaxWidth()) {
                 Text(primaryActionLabel)
             }
         }
@@ -234,17 +237,14 @@ private fun ScreenContainer(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 24.dp, vertical = 32.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
+            .padding(Dimens.screenContentPadding),
+        verticalArrangement = Arrangement.spacedBy(Dimens.sectionSpacing, Alignment.CenterVertically),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.headlineMedium
-        )
-        Text(
+        ScreenTitleText(text = title)
+        MetaText(
             text = description,
-            style = MaterialTheme.typography.bodyLarge,
+            modifier = Modifier.fillMaxWidth(),
             textAlign = TextAlign.Center
         )
         content()
