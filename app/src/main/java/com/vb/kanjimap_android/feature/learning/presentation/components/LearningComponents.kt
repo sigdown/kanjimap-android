@@ -79,7 +79,7 @@ fun LearningBlockListItem(
         modifier = modifier
             .fillMaxWidth()
             .clickable(onClick = onClick),
-        shape = Dimens.cardShape,
+        shape = MaterialTheme.shapes.large,
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainerLow
         )
@@ -185,7 +185,7 @@ fun StudyCardView(
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
-        shape = Dimens.cardShape,
+        shape = MaterialTheme.shapes.large,
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainerLow
         )

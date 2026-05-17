@@ -14,7 +14,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import com.vb.kanjimap_android.core.ui.theme.Dimens
 
@@ -26,8 +25,7 @@ fun ScreenTitleText(
     Text(
         text = text,
         modifier = modifier,
-        style = MaterialTheme.typography.headlineMedium,
-        fontWeight = FontWeight.SemiBold
+        style = MaterialTheme.typography.headlineMedium
     )
 }
 
@@ -83,7 +81,7 @@ fun SectionCard(
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
-        shape = Dimens.cardShape,
+        shape = MaterialTheme.shapes.large,
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainerLow
         )
@@ -109,7 +107,7 @@ fun PrimaryButton(
         onClick = onClick,
         modifier = modifier.defaultMinSize(minHeight = Dimens.buttonHeight),
         enabled = enabled,
-        shape = Dimens.buttonShape
+        shape = MaterialTheme.shapes.medium
     ) {
         content()
     }
@@ -126,7 +124,7 @@ fun SecondaryButton(
         onClick = onClick,
         modifier = modifier.defaultMinSize(minHeight = Dimens.buttonHeight),
         enabled = enabled,
-        shape = Dimens.buttonShape
+        shape = MaterialTheme.shapes.medium
     ) {
         content()
     }
