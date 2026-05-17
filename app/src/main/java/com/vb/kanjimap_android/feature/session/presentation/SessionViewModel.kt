@@ -17,19 +17,18 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class SessionViewModel @Inject constructor(
-    private val sessionRepository: SessionRepository,
     private val loginUseCase: LoginUseCase,
     private val registerUseCase: RegisterUseCase,
     private val getCurrentUserUseCase: GetCurrentUserUseCase,
-    private val logoutUseCase: LogoutUseCase
+    private val logoutUseCase: LogoutUseCase,
+    private val sessionRepository: SessionRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SessionUiState())
     val uiState: StateFlow<SessionUiState> = _uiState.asStateFlow()
 
     init {
-        observeSessionState()
-        checkSavedSession()
+        checkSession()
     }
 
     fun login(login: String, password: String) {
@@ -40,7 +39,8 @@ class SessionViewModel @Inject constructor(
                     it.copy(
                         isAuthenticated = true,
                         currentUser = session.user,
-                        errorMessage = null
+                        errorMessage = null,
+                        isRegisterMode = false
                     )
                 }
             }
@@ -50,11 +50,13 @@ class SessionViewModel @Inject constructor(
     fun register(username: String, email: String, password: String) {
         viewModelScope.launch {
             runCatchingWithLoading {
-                val user = registerUseCase(username, email, password)
+                registerUseCase(username, email, password)
                 _uiState.update {
                     it.copy(
-                        currentUser = user,
-                        errorMessage = null
+                        isAuthenticated = false,
+                        currentUser = null,
+                        errorMessage = null,
+                        isRegisterMode = false
                     )
                 }
             }
@@ -91,15 +93,52 @@ class SessionViewModel @Inject constructor(
         }
     }
 
-    fun checkSavedSession() {
+    fun checkSession() {
         viewModelScope.launch {
-            val hasToken = !sessionRepository.getSavedAccessToken().isNullOrBlank()
-            _uiState.update {
-                it.copy(
-                    isAuthenticated = hasToken,
-                    errorMessage = null
-                )
+            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+
+            runCatching {
+                if (!sessionRepository.hasSavedSession()) {
+                    _uiState.update {
+                        it.copy(
+                            isAuthenticated = false,
+                            currentUser = null,
+                            errorMessage = null
+                        )
+                    }
+                    return@runCatching
+                }
+
+                val currentUser = getCurrentUserUseCase()
+                _uiState.update {
+                    it.copy(
+                        isAuthenticated = true,
+                        currentUser = currentUser,
+                        errorMessage = null
+                    )
+                }
             }
+                .onFailure { throwable ->
+                    logoutUseCase()
+                    _uiState.update {
+                        it.copy(
+                            isAuthenticated = false,
+                            currentUser = null,
+                            errorMessage = throwable.message ?: "Unknown error"
+                        )
+                    }
+                }
+
+            _uiState.update { it.copy(isLoading = false) }
+        }
+    }
+
+    fun setRegisterMode(isRegisterMode: Boolean) {
+        _uiState.update {
+            it.copy(
+                isRegisterMode = isRegisterMode,
+                errorMessage = null
+            )
         }
     }
 
@@ -107,25 +146,16 @@ class SessionViewModel @Inject constructor(
         _uiState.update { it.copy(errorMessage = null) }
     }
 
-    private fun observeSessionState() {
-        viewModelScope.launch {
-            sessionRepository.isAuthenticated.collect { isAuthenticated ->
-                _uiState.update { state ->
-                    state.copy(
-                        isAuthenticated = isAuthenticated,
-                        currentUser = if (isAuthenticated) state.currentUser else null
-                    )
-                }
-            }
-        }
-    }
-
     private suspend fun runCatchingWithLoading(action: suspend () -> Unit) {
         _uiState.update { it.copy(isLoading = true, errorMessage = null) }
         runCatching { action() }
             .onFailure { throwable ->
                 _uiState.update {
-                    it.copy(errorMessage = throwable.message ?: "Unknown error")
+                    it.copy(
+                        isAuthenticated = false,
+                        currentUser = null,
+                        errorMessage = throwable.message ?: "Unknown error"
+                    )
                 }
             }
         _uiState.update { it.copy(isLoading = false) }

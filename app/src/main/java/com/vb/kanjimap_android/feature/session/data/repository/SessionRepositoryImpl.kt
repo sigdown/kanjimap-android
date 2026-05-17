@@ -9,19 +9,12 @@ import com.vb.kanjimap_android.feature.session.domain.model.Session
 import com.vb.kanjimap_android.feature.session.domain.model.User
 import com.vb.kanjimap_android.feature.session.domain.repository.SessionRepository
 import javax.inject.Inject
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.map
 
 class SessionRepositoryImpl @Inject constructor(
     private val authApi: AuthApi,
     private val sessionDataStore: SessionDataStore
 ) : SessionRepository {
-
-    override val accessToken: Flow<String?> = sessionDataStore.accessToken
-
-    override val isAuthenticated: Flow<Boolean> =
-        accessToken.map { !it.isNullOrBlank() }
 
     override suspend fun login(login: String, password: String): Session {
         val response = authApi.loginUser(
@@ -58,6 +51,9 @@ class SessionRepositoryImpl @Inject constructor(
     override suspend fun logout() {
         sessionDataStore.clearSession()
     }
+
+    override suspend fun hasSavedSession(): Boolean =
+        !getSavedAccessToken().isNullOrBlank()
 
     override suspend fun getSavedAccessToken(): String? =
         sessionDataStore.accessToken.firstOrNull()
