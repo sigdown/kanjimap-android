@@ -2,13 +2,19 @@ package com.vb.kanjimap_android.feature.learning.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.vb.kanjimap_android.core.common.time.toEpochMillisOrNull
 import com.vb.kanjimap_android.feature.learning.domain.model.LearningBlockDetails
 import com.vb.kanjimap_android.feature.learning.domain.model.StudyCard
 import com.vb.kanjimap_android.feature.learning.domain.model.StudyCardType
 import com.vb.kanjimap_android.feature.learning.domain.usecase.GetBlockDetailsUseCase
 import com.vb.kanjimap_android.feature.learning.domain.usecase.GetBlocksUseCase
+import com.vb.kanjimap_android.feature.learning.domain.usecase.GetKanjiProgressUseCase
+import com.vb.kanjimap_android.feature.learning.domain.usecase.GetWordProgressUseCase
+import com.vb.kanjimap_android.feature.learning.domain.usecase.UpdateKanjiProgressUseCase
+import com.vb.kanjimap_android.feature.learning.domain.usecase.UpdateWordProgressUseCase
 import com.vb.kanjimap_android.feature.library.domain.usecase.GetWordDetailsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.time.Instant
 import javax.inject.Inject
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,7 +29,11 @@ import kotlinx.coroutines.launch
 class LearningViewModel @Inject constructor(
     private val getBlocksUseCase: GetBlocksUseCase,
     private val getBlockDetailsUseCase: GetBlockDetailsUseCase,
-    private val getWordDetailsUseCase: GetWordDetailsUseCase
+    private val getWordDetailsUseCase: GetWordDetailsUseCase,
+    private val getWordProgressUseCase: GetWordProgressUseCase,
+    private val getKanjiProgressUseCase: GetKanjiProgressUseCase,
+    private val updateWordProgressUseCase: UpdateWordProgressUseCase,
+    private val updateKanjiProgressUseCase: UpdateKanjiProgressUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(LearningUiState())
@@ -194,7 +204,8 @@ class LearningViewModel @Inject constructor(
             state.copy(
                 study = state.study.copy(
                     currentIndex = nextIndex,
-                    isAnswerRevealed = false
+                    isAnswerRevealed = false,
+                    submitErrorMessage = null
                 )
             )
         }
@@ -206,10 +217,19 @@ class LearningViewModel @Inject constructor(
             state.copy(
                 study = state.study.copy(
                     currentIndex = previousIndex,
-                    isAnswerRevealed = false
+                    isAnswerRevealed = false,
+                    submitErrorMessage = null
                 )
             )
         }
+    }
+
+    fun markKnown() {
+        submitProgress(isKnown = true)
+    }
+
+    fun markUnknown() {
+        submitProgress(isKnown = false)
     }
 
     fun resetStudy() {
@@ -232,7 +252,9 @@ class LearningViewModel @Inject constructor(
                     currentIndex = 0,
                     isAnswerRevealed = false,
                     isLoading = false,
-                    errorMessage = if (cards.isEmpty()) "В этом блоке пока нет материалов для изучения" else null
+                    errorMessage = if (cards.isEmpty()) "В этом блоке пока нет материалов для изучения" else null,
+                    isSubmittingProgress = false,
+                    submitErrorMessage = null
                 )
             )
         }
@@ -246,31 +268,27 @@ class LearningViewModel @Inject constructor(
         val wordCards = details.words.map { word ->
             StudyCard(
                 id = "word_${word.wordId}",
+                itemId = word.wordId,
                 type = StudyCardType.WORD,
                 prompt = word.writingForm,
                 answerTitle = word.writingForm,
                 answerSubtitle = word.readingKana,
                 readings = listOf(word.readingKana),
                 meanings = wordMeanings[word.wordId].orEmpty(),
-                examples = listOfNotNull(
-                    word.jlptLevel?.let { "Уровень: $it" }
-                ),
-                relatedKanjis = word.writingForm
-                    .filter { it.code > 0x3000 }
-                    .map(Char::toString)
+                examples = emptyList(),
+                relatedKanjis = emptyList()
             )
         }
 
         val kanjiCards = details.kanjis.map { kanji ->
             StudyCard(
                 id = "kanji_${kanji.kanjiId}",
+                itemId = kanji.kanjiId,
                 type = StudyCardType.KANJI,
                 prompt = kanji.literal,
                 answerTitle = kanji.literal,
-                meanings = listOfNotNull(kanji.jlptLevel?.let { "Уровень: $it" }),
-                examples = listOfNotNull(
-                    kanji.strokeCount?.let { "$it черт" }
-                ),
+                meanings = emptyList(),
+                examples = emptyList(),
                 relatedWords = details.words
                     .filter { it.writingForm.contains(kanji.literal) }
                     .map { "${it.writingForm} • ${it.readingKana}" }
@@ -326,4 +344,104 @@ class LearningViewModel @Inject constructor(
                 .filter { it.second.isNotEmpty() }
                 .toMap()
         }
+
+    private fun submitProgress(isKnown: Boolean) {
+        val currentState = _uiState.value.study
+        val card = currentState.currentCard ?: return
+        if (!currentState.isAnswerRevealed || currentState.isSubmittingProgress) return
+
+        viewModelScope.launch {
+            _uiState.update {
+                it.copy(
+                    study = it.study.copy(
+                        isSubmittingProgress = true,
+                        submitErrorMessage = null
+                    )
+                )
+            }
+
+            val now = Instant.now()
+            val nextReviewAt = if (isKnown) {
+                now.plusSeconds(24 * 60 * 60)
+            } else {
+                now.plusSeconds(20 * 60)
+            }
+
+            val correctNumber = if (isKnown) 1 else 0
+            val wrongNumber = if (isKnown) 0 else 1
+
+            runCatching {
+                when (card.type) {
+                    StudyCardType.WORD -> {
+                        val current = runCatching { getWordProgressUseCase(card.itemId) }.getOrNull()
+                        updateWordProgressUseCase(
+                            id = card.itemId,
+                            status = current?.status ?: "learning",
+                            correctNumber = maxOf(correctNumber, current?.correctNumber ?: 0),
+                            wrongNumber = maxOf(wrongNumber, current?.wrongNumber ?: 0),
+                            repetitionLevel = maxOf(0, current?.repetitionLevel ?: 0),
+                            lastReviewAt = now.toString(),
+                            nextReviewAt = chooseNextReviewAt(
+                                currentNextReviewAt = current?.nextReviewAt,
+                                candidateNextReviewAt = nextReviewAt.toString()
+                            )
+                        )
+                    }
+
+                    StudyCardType.KANJI -> {
+                        val current = runCatching { getKanjiProgressUseCase(card.itemId) }.getOrNull()
+                        updateKanjiProgressUseCase(
+                            id = card.itemId,
+                            status = current?.status ?: "learning",
+                            correctNumber = maxOf(correctNumber, current?.correctNumber ?: 0),
+                            wrongNumber = maxOf(wrongNumber, current?.wrongNumber ?: 0),
+                            repetitionLevel = maxOf(0, current?.repetitionLevel ?: 0),
+                            lastReviewAt = now.toString(),
+                            nextReviewAt = chooseNextReviewAt(
+                                currentNextReviewAt = current?.nextReviewAt,
+                                candidateNextReviewAt = nextReviewAt.toString()
+                            )
+                        )
+                    }
+                }
+            }
+                .onSuccess {
+                    _uiState.update { state ->
+                        val nextIndex = (state.study.currentIndex + 1).coerceAtMost(state.study.cards.lastIndex)
+                        state.copy(
+                            study = state.study.copy(
+                                currentIndex = nextIndex,
+                                isAnswerRevealed = false,
+                                isSubmittingProgress = false,
+                                submitErrorMessage = null
+                            )
+                        )
+                    }
+                }
+                .onFailure { throwable ->
+                    _uiState.update {
+                        it.copy(
+                            study = it.study.copy(
+                                isSubmittingProgress = false,
+                                submitErrorMessage = throwable.message ?: "Не удалось обновить прогресс"
+                            )
+                        )
+                    }
+                }
+        }
+    }
+
+    private fun chooseNextReviewAt(
+        currentNextReviewAt: String?,
+        candidateNextReviewAt: String
+    ): String {
+        val currentMillis = currentNextReviewAt.toEpochMillisOrNull()
+        val candidateMillis = candidateNextReviewAt.toEpochMillisOrNull()
+        if (currentMillis == null || candidateMillis == null) return candidateNextReviewAt
+        return if (currentMillis > candidateMillis) {
+            currentNextReviewAt ?: candidateNextReviewAt
+        } else {
+            candidateNextReviewAt
+        }
+    }
 }

@@ -31,7 +31,9 @@ data class StudyUiState(
     val currentIndex: Int = 0,
     val isAnswerRevealed: Boolean = false,
     val isLoading: Boolean = false,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+    val isSubmittingProgress: Boolean = false,
+    val submitErrorMessage: String? = null
 ) {
     val currentCard: StudyCard?
         get() = cards.getOrNull(currentIndex)

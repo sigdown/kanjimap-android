@@ -31,6 +31,8 @@ fun StudyRoute(
         onShowAnswer = viewModel::showAnswer,
         onPreviousClick = viewModel::previousCard,
         onNextClick = viewModel::nextCard,
+        onKnownClick = viewModel::markKnown,
+        onUnknownClick = viewModel::markUnknown,
         onRetry = { viewModel.startStudy(blockId, mode) },
         modifier = modifier
     )

@@ -2,6 +2,7 @@ package com.vb.kanjimap_android.feature.learning.domain.model
 
 data class StudyCard(
     val id: String,
+    val itemId: Long,
     val type: StudyCardType,
     val prompt: String,
     val answerTitle: String? = null,

@@ -2,6 +2,7 @@ package com.vb.kanjimap_android.feature.learning.presentation
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -27,6 +28,8 @@ fun StudyScreen(
     onShowAnswer: () -> Unit,
     onPreviousClick: () -> Unit,
     onNextClick: () -> Unit,
+    onKnownClick: () -> Unit,
+    onUnknownClick: () -> Unit,
     onRetry: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -84,7 +87,7 @@ fun StudyScreen(
                         Button(
                             onClick = onShowAnswer,
                             modifier = Modifier.fillMaxWidth(),
-                            enabled = !uiState.isAnswerRevealed
+                            enabled = !uiState.isAnswerRevealed && !uiState.isSubmittingProgress
                         ) {
                             Text("Показать ответ")
                         }
@@ -92,7 +95,7 @@ fun StudyScreen(
                         OutlinedButton(
                             onClick = onPreviousClick,
                             modifier = Modifier.fillMaxWidth(),
-                            enabled = uiState.currentIndex > 0
+                            enabled = uiState.currentIndex > 0 && !uiState.isSubmittingProgress
                         ) {
                             Text("Назад")
                         }
@@ -100,9 +103,38 @@ fun StudyScreen(
                         Button(
                             onClick = onNextClick,
                             modifier = Modifier.fillMaxWidth(),
-                            enabled = uiState.currentIndex < uiState.cards.lastIndex
+                            enabled = uiState.currentIndex < uiState.cards.lastIndex &&
+                                !uiState.isSubmittingProgress
                         ) {
                             Text("Дальше")
+                        }
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(CoreSpacing.sm)
+                        ) {
+                            OutlinedButton(
+                                onClick = onUnknownClick,
+                                modifier = Modifier.weight(1f),
+                                enabled = uiState.isAnswerRevealed && !uiState.isSubmittingProgress
+                            ) {
+                                Text("Не знал")
+                            }
+                            Button(
+                                onClick = onKnownClick,
+                                modifier = Modifier.weight(1f),
+                                enabled = uiState.isAnswerRevealed && !uiState.isSubmittingProgress
+                            ) {
+                                Text("Знал")
+                            }
+                        }
+
+                        if (uiState.submitErrorMessage != null) {
+                            Text(
+                                text = uiState.submitErrorMessage,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.error
+                            )
                         }
                     }
                 }
