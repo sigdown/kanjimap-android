@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
 
 @HiltViewModel
 class SessionViewModel @Inject constructor(
@@ -119,13 +120,22 @@ class SessionViewModel @Inject constructor(
                 }
             }
                 .onFailure { throwable ->
-                    logoutUseCase()
-                    _uiState.update {
-                        it.copy(
-                            isAuthenticated = false,
-                            currentUser = null,
-                            errorMessage = throwable.message ?: "Unknown error"
-                        )
+                    if (throwable is HttpException && throwable.code() in listOf(401, 403)) {
+                        logoutUseCase()
+                        _uiState.update {
+                            it.copy(
+                                isAuthenticated = false,
+                                currentUser = null,
+                                errorMessage = throwable.message ?: "Unknown error"
+                            )
+                        }
+                    } else {
+                        _uiState.update {
+                            it.copy(
+                                isAuthenticated = true,
+                                errorMessage = throwable.message ?: "Unknown error"
+                            )
+                        }
                     }
                 }
 

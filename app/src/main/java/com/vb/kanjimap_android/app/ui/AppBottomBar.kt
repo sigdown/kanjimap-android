@@ -1,6 +1,7 @@
 package com.vb.kanjimap_android.app.ui
 
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
@@ -15,7 +16,9 @@ fun AppBottomBar(navController: NavHostController) {
     val navBackStackEntry = navController.currentBackStackEntryAsState().value
     val currentDestination = navBackStackEntry?.destination
 
-    NavigationBar {
+    NavigationBar(
+        containerColor = MaterialTheme.colorScheme.background
+    ) {
         BottomDestinations.items.forEach { destination ->
             val isSelected = currentDestination
                 ?.hierarchy

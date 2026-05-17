@@ -46,7 +46,7 @@ fun AppNavGraph(
     NavHost(
         navController = navController,
         startDestination = Destination.Home.route,
-        modifier = modifier.padding(innerPadding)
+        modifier = modifier
     ) {
         composable(Destination.Home.route) {
             HomeRoute(
@@ -54,7 +54,8 @@ fun AppNavGraph(
                 onOpenReview = { navController.navigate(Destination.Review.route) },
                 onOpenBlocks = { navController.navigate(Destination.Learn.route) },
                 onOpenWords = { navController.navigate(Destination.Words.route) },
-                onOpenKanji = { navController.navigate(Destination.Kanji.route) }
+                onOpenKanji = { navController.navigate(Destination.Kanji.route) },
+                contentPadding = innerPadding
             )
         }
         composable(Destination.Learn.route) {
@@ -62,21 +63,24 @@ fun AppNavGraph(
                 onBlockClick = { blockId ->
                     navController.navigate(Destination.BlockDetails.createRoute(blockId))
                 },
-                onAuthClick = { navController.navigate(Destination.Auth.route) }
+                onAuthClick = { navController.navigate(Destination.Auth.route) },
+                contentPadding = innerPadding
             )
         }
         composable(Destination.Words.route) {
             WordsRoute(
                 onWordClick = { wordId ->
                     navController.navigate(Destination.WordDetails.createRoute(wordId))
-                }
+                },
+                contentPadding = innerPadding
             )
         }
         composable(Destination.Kanji.route) {
             KanjiRoute(
                 onKanjiClick = { kanjiId ->
                     navController.navigate(Destination.KanjiDetails.createRoute(kanjiId))
-                }
+                },
+                contentPadding = innerPadding
             )
         }
         composable(Destination.Auth.route) {
@@ -105,7 +109,11 @@ fun AppNavGraph(
             )
         }
         composable(Destination.Saved.route) {
-            PlaceholderScreen(title = "Saved", description = "Saved content placeholder.")
+            PlaceholderScreen(
+                title = "Saved",
+                description = "Saved content placeholder.",
+                modifier = Modifier.padding(innerPadding)
+            )
         }
         composable(Destination.Profile.route) {
             PlaceholderScreen(
@@ -117,7 +125,8 @@ fun AppNavGraph(
                         popUpTo(Destination.Home.route) { inclusive = false }
                         launchSingleTop = true
                     }
-                }
+                },
+                modifier = Modifier.padding(innerPadding)
             )
         }
         composable(
@@ -214,11 +223,13 @@ private fun PlaceholderScreen(
     title: String,
     description: String,
     primaryActionLabel: String? = null,
-    onPrimaryAction: (() -> Unit)? = null
+    onPrimaryAction: (() -> Unit)? = null,
+    modifier: Modifier = Modifier
 ) {
     ScreenContainer(
         title = title,
-        description = description
+        description = description,
+        modifier = modifier
     ) {
         if (primaryActionLabel != null && onPrimaryAction != null) {
             PrimaryButton(onClick = onPrimaryAction, modifier = Modifier.fillMaxWidth()) {
@@ -232,10 +243,11 @@ private fun PlaceholderScreen(
 private fun ScreenContainer(
     title: String,
     description: String,
+    modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .padding(Dimens.screenContentPadding),
         verticalArrangement = Arrangement.spacedBy(Dimens.sectionSpacing, Alignment.CenterVertically),

@@ -2,6 +2,7 @@ package com.vb.kanjimap_android.feature.learning.presentation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -11,7 +12,8 @@ import com.vb.kanjimap_android.feature.session.presentation.SessionViewModel
 fun LearnRoute(
     onBlockClick: (Long) -> Unit,
     onAuthClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues()
 ) {
     val sessionViewModel: SessionViewModel = hiltViewModel()
     val learningViewModel: LearningViewModel = hiltViewModel()
@@ -30,6 +32,7 @@ fun LearnRoute(
         onBlockClick = onBlockClick,
         onAuthClick = onAuthClick,
         onRetry = { learningViewModel.loadBlocks(force = true) },
-        modifier = modifier
+        modifier = modifier,
+        contentPadding = contentPadding
     )
 }

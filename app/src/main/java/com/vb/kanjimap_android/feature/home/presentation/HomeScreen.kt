@@ -2,6 +2,7 @@ package com.vb.kanjimap_android.feature.home.presentation
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -34,9 +35,10 @@ fun HomeScreen(
     onOpenWords: () -> Unit,
     onOpenKanji: () -> Unit,
     onRetry: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues()
 ) {
-    Surface(modifier = modifier.fillMaxSize()) {
+    Surface(modifier = Modifier.fillMaxSize()) {
         when {
             uiState.isLoading -> LoadingView(message = "Загружаем Home")
             uiState.errorMessage != null -> {
@@ -50,7 +52,11 @@ fun HomeScreen(
                 )
             }
 
-            uiState.isGuest -> GuestHomeContent(onAuthClick = onAuthClick)
+            uiState.isGuest -> GuestHomeContent(
+                onAuthClick = onAuthClick,
+                modifier = modifier,
+                contentPadding = contentPadding
+            )
             else -> {
                 val summary = uiState.summary ?: return@Surface
                 HomeSummaryContent(
@@ -58,7 +64,9 @@ fun HomeScreen(
                     onOpenReview = onOpenReview,
                     onOpenBlocks = onOpenBlocks,
                     onOpenWords = onOpenWords,
-                    onOpenKanji = onOpenKanji
+                    onOpenKanji = onOpenKanji,
+                    modifier = modifier,
+                    contentPadding = contentPadding
                 )
             }
         }
@@ -67,11 +75,14 @@ fun HomeScreen(
 
 @Composable
 private fun GuestHomeContent(
-    onAuthClick: () -> Unit
+    onAuthClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues()
 ) {
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
+            .padding(contentPadding)
             .padding(Dimens.screenContentPadding),
         verticalArrangement = Arrangement.spacedBy(Dimens.sectionSpacing)
     ) {
@@ -92,11 +103,14 @@ private fun HomeSummaryContent(
     onOpenReview: () -> Unit,
     onOpenBlocks: () -> Unit,
     onOpenWords: () -> Unit,
-    onOpenKanji: () -> Unit
+    onOpenKanji: () -> Unit,
+    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues()
 ) {
     LazyColumn(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
+            .padding(contentPadding)
             .padding(Dimens.screenContentPadding),
         verticalArrangement = Arrangement.spacedBy(Dimens.sectionSpacing)
     ) {

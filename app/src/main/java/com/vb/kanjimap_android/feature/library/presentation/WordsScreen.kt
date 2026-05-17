@@ -1,10 +1,10 @@
 package com.vb.kanjimap_android.feature.library.presentation
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -27,14 +27,15 @@ fun WordsScreen(
     onQueryChange: (String) -> Unit,
     onSearchClick: () -> Unit,
     onWordClick: (Long) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues()
 ) {
-    Surface(modifier = modifier.fillMaxSize()) {
+    Surface(modifier = Modifier.fillMaxSize()) {
         LazyColumn(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxSize()
                 .statusBarsPadding()
-                .navigationBarsPadding()
+                .padding(contentPadding)
                 .padding(Dimens.screenContentPadding),
             verticalArrangement = Arrangement.spacedBy(Dimens.sectionSpacing)
         ) {
