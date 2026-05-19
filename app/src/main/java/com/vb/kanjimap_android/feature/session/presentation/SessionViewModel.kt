@@ -52,10 +52,11 @@ class SessionViewModel @Inject constructor(
         viewModelScope.launch {
             runCatchingWithLoading {
                 registerUseCase(username, email, password)
+                val session = loginUseCase(email, password)
                 _uiState.update {
                     it.copy(
-                        isAuthenticated = false,
-                        currentUser = null,
+                        isAuthenticated = true,
+                        currentUser = session.user,
                         errorMessage = null,
                         isRegisterMode = false
                     )

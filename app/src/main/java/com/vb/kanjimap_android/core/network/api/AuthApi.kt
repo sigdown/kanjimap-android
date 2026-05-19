@@ -14,7 +14,7 @@ interface AuthApi {
     suspend fun healthCheck(): HealthResponseDto
 
     @POST("auth/register")
-    suspend fun registerUser(@Body body: RegisterRequestDto): AuthResponseDto
+    suspend fun registerUser(@Body body: RegisterRequestDto): UserProfileResponseDto
 
     @POST("auth/login")
     suspend fun loginUser(@Body body: LoginRequestDto): AuthResponseDto

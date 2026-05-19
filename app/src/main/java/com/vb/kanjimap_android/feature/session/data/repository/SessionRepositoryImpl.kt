@@ -39,7 +39,7 @@ class SessionRepositoryImpl @Inject constructor(
             )
         )
 
-        return response.user.toDomain()
+        return response.toDomain()
     }
 
     override suspend fun getCurrentUser(): User {
