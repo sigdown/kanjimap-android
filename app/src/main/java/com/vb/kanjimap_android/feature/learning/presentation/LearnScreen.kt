@@ -14,10 +14,11 @@ import com.vb.kanjimap_android.core.ui.components.ScreenList
 import com.vb.kanjimap_android.core.ui.components.SurfaceSection
 import com.vb.kanjimap_android.feature.learning.presentation.components.LearningBlockListItem
 import com.vb.kanjimap_android.feature.learning.presentation.components.LearningEmptyState
+import com.vb.kanjimap_android.feature.session.presentation.SessionAuthState
 
 @Composable
 fun LearnScreen(
-    isAuthenticated: Boolean,
+    authState: SessionAuthState,
     uiState: LearnUiState,
     onBlockClick: (Long) -> Unit,
     onAuthClick: () -> Unit,
@@ -37,21 +38,11 @@ fun LearnScreen(
         }
 
         when {
-            uiState.isLoading -> {
-                item { LoadingView(message = "Загружаем блоки") }
+            authState == SessionAuthState.CHECKING -> {
+                item { LoadingView(message = "Проверяем сессию") }
             }
 
-            uiState.errorMessage != null -> {
-                item {
-                    ErrorView(
-                        message = uiState.errorMessage,
-                        retryLabel = "Повторить",
-                        onRetry = onRetry
-                    )
-                }
-            }
-
-            !isAuthenticated -> {
+            authState == SessionAuthState.GUEST -> {
                 item {
                     SurfaceSection(title = "Доступ к обучению") {
                         LearningEmptyState(
@@ -67,6 +58,20 @@ fun LearnScreen(
                             }
                         )
                     }
+                }
+            }
+
+            uiState.isLoading -> {
+                item { LoadingView(message = "Загружаем блоки") }
+            }
+
+            uiState.errorMessage != null -> {
+                item {
+                    ErrorView(
+                        message = uiState.errorMessage,
+                        retryLabel = "Повторить",
+                        onRetry = onRetry
+                    )
                 }
             }
 

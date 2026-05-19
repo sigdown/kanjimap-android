@@ -4,17 +4,16 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 @Composable
 fun AuthRoute(
+    sessionViewModel: SessionViewModel,
     onAuthSuccess: () -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues()
 ) {
-    val viewModel: SessionViewModel = hiltViewModel()
-    val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
+    val uiState = sessionViewModel.uiState.collectAsStateWithLifecycle().value
 
     LaunchedEffect(uiState.isAuthenticated, uiState.currentUser) {
         if (uiState.isAuthenticated && uiState.currentUser != null) {
@@ -24,9 +23,9 @@ fun AuthRoute(
 
     AuthScreen(
         uiState = uiState,
-        onLogin = viewModel::login,
-        onRegister = viewModel::register,
-        onSwitchMode = viewModel::setRegisterMode,
+        onLogin = sessionViewModel::login,
+        onRegister = sessionViewModel::register,
+        onSwitchMode = sessionViewModel::setRegisterMode,
         modifier = modifier,
         contentPadding = contentPadding
     )

@@ -38,6 +38,7 @@ class SessionViewModel @Inject constructor(
                 val session = loginUseCase(login, password)
                 _uiState.update {
                     it.copy(
+                        isCheckingSession = false,
                         isAuthenticated = true,
                         currentUser = session.user,
                         errorMessage = null,
@@ -55,6 +56,7 @@ class SessionViewModel @Inject constructor(
                 val session = loginUseCase(email, password)
                 _uiState.update {
                     it.copy(
+                        isCheckingSession = false,
                         isAuthenticated = true,
                         currentUser = session.user,
                         errorMessage = null,
@@ -71,6 +73,7 @@ class SessionViewModel @Inject constructor(
                 val user = getCurrentUserUseCase()
                 _uiState.update {
                     it.copy(
+                        isCheckingSession = false,
                         isAuthenticated = true,
                         currentUser = user,
                         errorMessage = null
@@ -86,6 +89,7 @@ class SessionViewModel @Inject constructor(
                 logoutUseCase()
                 _uiState.update {
                     it.copy(
+                        isCheckingSession = false,
                         isAuthenticated = false,
                         currentUser = null,
                         errorMessage = null
@@ -97,12 +101,19 @@ class SessionViewModel @Inject constructor(
 
     fun checkSession() {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+            _uiState.update {
+                it.copy(
+                    isLoading = true,
+                    isCheckingSession = true,
+                    errorMessage = null
+                )
+            }
 
             runCatching {
                 if (!hasSavedSessionUseCase()) {
                     _uiState.update {
                         it.copy(
+                            isCheckingSession = false,
                             isAuthenticated = false,
                             currentUser = null,
                             errorMessage = null
@@ -114,6 +125,7 @@ class SessionViewModel @Inject constructor(
                 val currentUser = getCurrentUserUseCase()
                 _uiState.update {
                     it.copy(
+                        isCheckingSession = false,
                         isAuthenticated = true,
                         currentUser = currentUser,
                         errorMessage = null
@@ -125,6 +137,7 @@ class SessionViewModel @Inject constructor(
                         logoutUseCase()
                         _uiState.update {
                             it.copy(
+                                isCheckingSession = false,
                                 isAuthenticated = false,
                                 currentUser = null,
                                 errorMessage = throwable.message ?: "Unknown error"
@@ -133,14 +146,16 @@ class SessionViewModel @Inject constructor(
                     } else {
                         _uiState.update {
                             it.copy(
-                                isAuthenticated = true,
+                                isCheckingSession = false,
+                                isAuthenticated = false,
+                                currentUser = null,
                                 errorMessage = throwable.message ?: "Unknown error"
                             )
                         }
                     }
                 }
 
-            _uiState.update { it.copy(isLoading = false) }
+            _uiState.update { it.copy(isLoading = false, isCheckingSession = false) }
         }
     }
 
@@ -163,6 +178,7 @@ class SessionViewModel @Inject constructor(
             .onFailure { throwable ->
                 _uiState.update {
                     it.copy(
+                        isCheckingSession = false,
                         isAuthenticated = false,
                         currentUser = null,
                         errorMessage = throwable.message ?: "Unknown error"

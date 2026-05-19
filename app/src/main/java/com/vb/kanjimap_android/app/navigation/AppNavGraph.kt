@@ -8,9 +8,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -33,6 +35,9 @@ import com.vb.kanjimap_android.feature.library.presentation.WordDetailsRoute
 import com.vb.kanjimap_android.feature.library.presentation.WordsRoute
 import com.vb.kanjimap_android.feature.review.presentation.ReviewRoute
 import com.vb.kanjimap_android.feature.session.presentation.AuthRoute
+import com.vb.kanjimap_android.feature.session.presentation.SessionViewModel
+
+private const val APP_GRAPH_ROUTE = "app_graph"
 
 @Composable
 fun rememberAppNavController(): NavHostController = rememberNavController()
@@ -46,10 +51,16 @@ fun AppNavGraph(
     NavHost(
         navController = navController,
         startDestination = Destination.Home.route,
+        route = APP_GRAPH_ROUTE,
         modifier = modifier
     ) {
-        composable(Destination.Home.route) {
+        composable(Destination.Home.route) { backStackEntry ->
+            val parentEntry = remember(backStackEntry) {
+                navController.getBackStackEntry(APP_GRAPH_ROUTE)
+            }
+            val sessionViewModel: SessionViewModel = hiltViewModel(parentEntry)
             HomeRoute(
+                sessionViewModel = sessionViewModel,
                 onAuthClick = { navController.navigate(Destination.Auth.route) },
                 onOpenReview = { navController.navigate(Destination.Review.route) },
                 onOpenBlocks = { navController.navigate(Destination.Learn.route) },
@@ -58,8 +69,13 @@ fun AppNavGraph(
                 contentPadding = innerPadding
             )
         }
-        composable(Destination.Learn.route) {
+        composable(Destination.Learn.route) { backStackEntry ->
+            val parentEntry = remember(backStackEntry) {
+                navController.getBackStackEntry(APP_GRAPH_ROUTE)
+            }
+            val sessionViewModel: SessionViewModel = hiltViewModel(parentEntry)
             LearnRoute(
+                sessionViewModel = sessionViewModel,
                 onBlockClick = { blockId ->
                     navController.navigate(Destination.BlockDetails.createRoute(blockId))
                 },
@@ -83,8 +99,13 @@ fun AppNavGraph(
                 contentPadding = innerPadding
             )
         }
-        composable(Destination.Auth.route) {
+        composable(Destination.Auth.route) { backStackEntry ->
+            val parentEntry = remember(backStackEntry) {
+                navController.getBackStackEntry(APP_GRAPH_ROUTE)
+            }
+            val sessionViewModel: SessionViewModel = hiltViewModel(parentEntry)
             AuthRoute(
+                sessionViewModel = sessionViewModel,
                 onAuthSuccess = {
                     val returned = navController.popBackStack()
                     if (!returned) {
