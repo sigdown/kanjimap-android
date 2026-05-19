@@ -1,16 +1,15 @@
 package com.vb.kanjimap_android.feature.session.presentation
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -27,11 +26,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.vb.kanjimap_android.core.ui.components.MetaText
 import com.vb.kanjimap_android.core.ui.components.PrimaryButton
-import com.vb.kanjimap_android.core.ui.components.ScreenTitleText
+import com.vb.kanjimap_android.core.ui.components.ScreenHeader
+import com.vb.kanjimap_android.core.ui.components.SurfaceSection
 import com.vb.kanjimap_android.core.ui.theme.Dimens
 import com.vb.kanjimap_android.ui.theme.KanjimapandroidTheme
 
@@ -41,7 +41,8 @@ fun AuthScreen(
     onLogin: (login: String, password: String) -> Unit,
     onRegister: (username: String, email: String, password: String) -> Unit,
     onSwitchMode: (isRegisterMode: Boolean) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues()
 ) {
     var login by rememberSaveable { mutableStateOf("") }
     var username by rememberSaveable { mutableStateOf("") }
@@ -49,7 +50,6 @@ fun AuthScreen(
     var password by rememberSaveable { mutableStateOf("") }
 
     val isRegisterMode = uiState.isRegisterMode
-    val scrollState = rememberScrollState()
     val credentialLabel = if (isRegisterMode) "Email" else "Логин или email"
     val switchModeText = if (isRegisterMode) {
         "Уже есть аккаунт? Войти"
@@ -58,107 +58,107 @@ fun AuthScreen(
     }
 
     Surface(modifier = modifier.fillMaxSize()) {
-        Box(
-            modifier = Modifier.fillMaxSize()
-        ) {
+        Box(modifier = Modifier.fillMaxSize()) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .statusBarsPadding()
-                    .navigationBarsPadding()
-                    .verticalScroll(scrollState)
-                    .padding(Dimens.screenContentPadding),
-                verticalArrangement = Arrangement.spacedBy(Dimens.sectionSpacing)
+                    .padding(contentPadding)
+                    .padding(Dimens.screenContentPadding)
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(28.dp)
             ) {
-                ScreenTitleText(
-                    text = if (isRegisterMode) "Регистрация" else "Авторизация"
+                ScreenHeader(
+                    title = if (isRegisterMode) "Регистрация" else "Авторизация",
+                    subtitle = if (isRegisterMode) {
+                        "Создайте аккаунт, чтобы открыть обучение и повторение"
+                    } else {
+                        "Войдите, чтобы открыть персональную зону"
+                    }
                 )
 
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(Dimens.sectionSpacing)
-                ) {
+                SurfaceSection(title = if (isRegisterMode) "Данные аккаунта" else "Вход") {
                     if (uiState.errorMessage != null) {
-                        ErrorMessage(message = uiState.errorMessage)
+                        MetaText(
+                            text = uiState.errorMessage,
+                            color = MaterialTheme.colorScheme.error
+                        )
                     }
 
-                    if (isRegisterMode) {
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalArrangement = Arrangement.spacedBy(Dimens.sectionSpacing)
+                    ) {
+                        if (isRegisterMode) {
+                            OutlinedTextField(
+                                value = username,
+                                onValueChange = { username = it },
+                                label = { Text("Имя пользователя") },
+                                singleLine = true,
+                                enabled = !uiState.isLoading,
+                                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+
                         OutlinedTextField(
-                            value = username,
-                            onValueChange = { username = it },
-                            label = { Text("Имя пользователя") },
+                            value = if (isRegisterMode) email else login,
+                            onValueChange = {
+                                if (isRegisterMode) email = it else login = it
+                            },
+                            label = { Text(credentialLabel) },
                             singleLine = true,
                             enabled = !uiState.isLoading,
-                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Email,
+                                imeAction = ImeAction.Next
+                            ),
                             modifier = Modifier.fillMaxWidth()
                         )
-                    }
 
-                    OutlinedTextField(
-                        value = if (isRegisterMode) email else login,
-                        onValueChange = {
-                            if (isRegisterMode) {
-                                email = it
-                            } else {
-                                login = it
-                            }
-                        },
-                        label = { Text(credentialLabel) },
-                        singleLine = true,
-                        enabled = !uiState.isLoading,
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Email,
-                            imeAction = ImeAction.Next
-                        ),
-                        modifier = Modifier.fillMaxWidth()
-                    )
-
-                    OutlinedTextField(
-                        value = password,
-                        onValueChange = { password = it },
-                        label = { Text("Пароль") },
-                        singleLine = true,
-                        enabled = !uiState.isLoading,
-                        visualTransformation = PasswordVisualTransformation(),
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Password,
-                            imeAction = ImeAction.Done
-                        ),
-                        modifier = Modifier.fillMaxWidth()
-                    )
-
-                    PrimaryButton(
-                        onClick = {
-                            if (isRegisterMode) {
-                                onRegister(username.trim(), email.trim(), password)
-                            } else {
-                                onLogin(login.trim(), password)
-                            }
-                        },
-                        enabled = !uiState.isLoading && canSubmit(
-                            isRegisterMode = isRegisterMode,
-                            login = login,
-                            username = username,
-                            email = email,
-                            password = password
-                        ),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(if (isRegisterMode) "Зарегистрироваться" else "Войти")
-                    }
-
-                    TextButton(
-                        onClick = {
-                            onSwitchMode(!isRegisterMode)
-                            password = ""
-                        },
-                        enabled = !uiState.isLoading,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(
-                            text = switchModeText,
-                            textAlign = TextAlign.Center
+                        OutlinedTextField(
+                            value = password,
+                            onValueChange = { password = it },
+                            label = { Text("Пароль") },
+                            singleLine = true,
+                            enabled = !uiState.isLoading,
+                            visualTransformation = PasswordVisualTransformation(),
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Password,
+                                imeAction = ImeAction.Done
+                            ),
+                            modifier = Modifier.fillMaxWidth()
                         )
+
+                        PrimaryButton(
+                            onClick = {
+                                if (isRegisterMode) {
+                                    onRegister(username.trim(), email.trim(), password)
+                                } else {
+                                    onLogin(login.trim(), password)
+                                }
+                            },
+                            enabled = !uiState.isLoading && canSubmit(
+                                isRegisterMode = isRegisterMode,
+                                login = login,
+                                username = username,
+                                email = email,
+                                password = password
+                            ),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(if (isRegisterMode) "Зарегистрироваться" else "Войти")
+                        }
+
+                        TextButton(
+                            onClick = {
+                                onSwitchMode(!isRegisterMode)
+                                password = ""
+                            },
+                            enabled = !uiState.isLoading,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(switchModeText)
+                        }
                     }
                 }
             }
@@ -173,15 +173,6 @@ fun AuthScreen(
             }
         }
     }
-}
-
-@Composable
-private fun ErrorMessage(message: String) {
-    MetaText(
-        text = message,
-        modifier = Modifier.fillMaxWidth(),
-        color = MaterialTheme.colorScheme.error
-    )
 }
 
 private fun canSubmit(
@@ -209,7 +200,8 @@ private fun AuthScreenPreview() {
             ),
             onLogin = { _, _ -> },
             onRegister = { _, _, _ -> },
-            onSwitchMode = {}
+            onSwitchMode = {},
+            contentPadding = PaddingValues()
         )
     }
 }
@@ -224,7 +216,8 @@ private fun AuthScreenRegisterPreview() {
             ),
             onLogin = { _, _ -> },
             onRegister = { _, _, _ -> },
-            onSwitchMode = {}
+            onSwitchMode = {},
+            contentPadding = PaddingValues()
         )
     }
 }

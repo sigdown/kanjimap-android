@@ -1,25 +1,21 @@
 package com.vb.kanjimap_android.feature.learning.presentation
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.vb.kanjimap_android.core.ui.components.ErrorView
 import com.vb.kanjimap_android.core.ui.components.LoadingView
 import com.vb.kanjimap_android.core.ui.components.MetaText
 import com.vb.kanjimap_android.core.ui.components.PrimaryButton
+import com.vb.kanjimap_android.core.ui.components.ScreenHeader
+import com.vb.kanjimap_android.core.ui.components.ScreenList
 import com.vb.kanjimap_android.core.ui.components.SecondaryButton
-import com.vb.kanjimap_android.core.ui.theme.CoreSpacing
-import com.vb.kanjimap_android.core.ui.theme.Dimens
+import com.vb.kanjimap_android.core.ui.components.SurfaceSection
 import com.vb.kanjimap_android.feature.learning.presentation.components.LearningEmptyState
 import com.vb.kanjimap_android.feature.learning.presentation.components.StudyCardView
 
@@ -32,55 +28,54 @@ fun StudyScreen(
     onKnownClick: () -> Unit,
     onUnknownClick: () -> Unit,
     onRetry: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues()
 ) {
-    Surface(modifier = modifier.fillMaxSize()) {
-        when {
-            uiState.isLoading -> LoadingView(message = "Подготавливаем карточки")
-            uiState.errorMessage != null -> {
-                ErrorView(
-                    message = uiState.errorMessage,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = Dimens.screenHorizontalPadding),
-                    retryLabel = "Повторить",
-                    onRetry = onRetry
-                )
-            }
+    when {
+        uiState.isLoading -> LoadingView(message = "Подготавливаем карточки")
+        uiState.errorMessage != null -> {
+            ErrorView(
+                message = uiState.errorMessage,
+                retryLabel = "Повторить",
+                onRetry = onRetry,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+        uiState.currentCard == null -> {
+            LearningEmptyState(
+                title = "Карточек пока нет",
+                description = "Для выбранного режима обучения ничего не найдено.",
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+        else -> {
+            val currentCard = uiState.currentCard ?: return
 
-            uiState.currentCard == null -> {
-                LearningEmptyState(
-                    title = "Карточек пока нет",
-                    description = "Для выбранного режима обучения ничего не найдено.",
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = Dimens.screenHorizontalPadding)
-                )
-            }
+            ScreenList(
+                modifier = modifier,
+                contentPadding = contentPadding
+            ) {
+                item {
+                    ScreenHeader(
+                        title = "Изучение",
+                        subtitle = uiState.progressText
+                    )
+                }
 
-            else -> {
-                val currentCard = uiState.currentCard ?: return@Surface
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .statusBarsPadding()
-                        .navigationBarsPadding()
-                        .padding(Dimens.screenContentPadding),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(Dimens.sectionSpacing)
-                ) {
-                    MetaText(text = uiState.progressText)
-
+                item {
                     StudyCardView(
                         card = currentCard,
                         isAnswerVisible = uiState.isAnswerRevealed,
                         modifier = Modifier.fillMaxWidth()
                     )
+                }
 
-                    Column(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalArrangement = Arrangement.spacedBy(Dimens.cardInnerSpacing)
-                    ) {
+                item {
+                    SurfaceSection(title = "Действия") {
+                        if (uiState.submitErrorMessage != null) {
+                            MetaText(text = uiState.submitErrorMessage)
+                        }
+
                         PrimaryButton(
                             onClick = onShowAnswer,
                             modifier = Modifier.fillMaxWidth(),
@@ -89,26 +84,30 @@ fun StudyScreen(
                             Text("Показать ответ")
                         }
 
-                        SecondaryButton(
-                            onClick = onPreviousClick,
+                        Row(
                             modifier = Modifier.fillMaxWidth(),
-                            enabled = uiState.currentIndex > 0 && !uiState.isSubmittingProgress
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
-                            Text("Назад")
-                        }
-
-                        PrimaryButton(
-                            onClick = onNextClick,
-                            modifier = Modifier.fillMaxWidth(),
-                            enabled = uiState.currentIndex < uiState.cards.lastIndex &&
-                                !uiState.isSubmittingProgress
-                        ) {
-                            Text("Дальше")
+                            SecondaryButton(
+                                onClick = onPreviousClick,
+                                modifier = Modifier.weight(1f),
+                                enabled = uiState.currentIndex > 0 && !uiState.isSubmittingProgress
+                            ) {
+                                Text("Назад")
+                            }
+                            SecondaryButton(
+                                onClick = onNextClick,
+                                modifier = Modifier.weight(1f),
+                                enabled = uiState.currentIndex < uiState.cards.lastIndex &&
+                                    !uiState.isSubmittingProgress
+                            ) {
+                                Text("Дальше")
+                            }
                         }
 
                         Row(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(CoreSpacing.sm)
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
                             SecondaryButton(
                                 onClick = onUnknownClick,
@@ -124,10 +123,6 @@ fun StudyScreen(
                             ) {
                                 Text("Знал")
                             }
-                        }
-
-                        if (uiState.submitErrorMessage != null) {
-                            MetaText(text = uiState.submitErrorMessage)
                         }
                     }
                 }

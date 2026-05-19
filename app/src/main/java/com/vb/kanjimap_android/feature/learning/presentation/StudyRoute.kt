@@ -1,5 +1,6 @@
 package com.vb.kanjimap_android.feature.learning.presentation
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -11,7 +12,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 fun StudyRoute(
     blockId: Long,
     mode: StudyMode,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues()
 ) {
     val viewModel: LearningViewModel = hiltViewModel()
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
@@ -34,6 +36,7 @@ fun StudyRoute(
         onKnownClick = viewModel::markKnown,
         onUnknownClick = viewModel::markUnknown,
         onRetry = { viewModel.startStudy(blockId, mode) },
-        modifier = modifier
+        modifier = modifier,
+        contentPadding = contentPadding
     )
 }

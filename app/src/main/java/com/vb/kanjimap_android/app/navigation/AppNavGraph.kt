@@ -93,7 +93,8 @@ fun AppNavGraph(
                             launchSingleTop = true
                         }
                     }
-                }
+                },
+                contentPadding = innerPadding
             )
         }
         composable(Destination.Review.route) {
@@ -105,7 +106,8 @@ fun AppNavGraph(
                         popUpTo(Destination.Home.route) { inclusive = false }
                         launchSingleTop = true
                     }
-                }
+                },
+                contentPadding = innerPadding
             )
         }
         composable(Destination.Saved.route) {
@@ -142,7 +144,8 @@ fun AppNavGraph(
                     },
                     onRelatedWordClick = { relatedWordId ->
                         navController.navigate(Destination.WordDetails.createRoute(relatedWordId))
-                    }
+                    },
+                    contentPadding = innerPadding
                 )
             }
         }
@@ -156,7 +159,8 @@ fun AppNavGraph(
                     kanjiId = kanjiId,
                     onWordClick = { wordId ->
                         navController.navigate(Destination.WordDetails.createRoute(wordId))
-                    }
+                    },
+                    contentPadding = innerPadding
                 )
             }
         }
@@ -170,7 +174,8 @@ fun AppNavGraph(
                     blockId = blockId,
                     onStudyClick = { mode ->
                         navController.navigate(Destination.Study.createRoute(blockId, mode.value))
-                    }
+                    },
+                    contentPadding = innerPadding
                 )
             }
         }
@@ -189,7 +194,8 @@ fun AppNavGraph(
             if (blockId != null) {
                 StudyRoute(
                     blockId = blockId,
-                    mode = mode
+                    mode = mode,
+                    contentPadding = innerPadding
                 )
             }
         }

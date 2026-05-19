@@ -1,5 +1,6 @@
 package com.vb.kanjimap_android.feature.learning.presentation
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
@@ -10,7 +11,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 fun BlockDetailsRoute(
     blockId: Long,
     onStudyClick: (StudyMode) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues()
 ) {
     val viewModel: LearningViewModel = hiltViewModel()
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
@@ -25,6 +27,7 @@ fun BlockDetailsRoute(
         onStudyWordsClick = { onStudyClick(StudyMode.WORDS) },
         onStudyKanjiClick = { onStudyClick(StudyMode.KANJI) },
         onStudyAllClick = { onStudyClick(StudyMode.ALL) },
-        modifier = modifier
+        modifier = modifier,
+        contentPadding = contentPadding
     )
 }

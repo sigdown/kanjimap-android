@@ -1,5 +1,6 @@
 package com.vb.kanjimap_android.feature.session.presentation
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
@@ -10,6 +11,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 fun AuthRoute(
     onAuthSuccess: () -> Unit,
     modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues()
 ) {
     val viewModel: SessionViewModel = hiltViewModel()
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
@@ -25,6 +27,7 @@ fun AuthRoute(
         onLogin = viewModel::login,
         onRegister = viewModel::register,
         onSwitchMode = viewModel::setRegisterMode,
-        modifier = modifier
+        modifier = modifier,
+        contentPadding = contentPadding
     )
 }

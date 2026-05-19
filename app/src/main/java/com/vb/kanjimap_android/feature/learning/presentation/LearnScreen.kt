@@ -1,24 +1,17 @@
 package com.vb.kanjimap_android.feature.learning.presentation
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.vb.kanjimap_android.core.ui.components.ErrorView
 import com.vb.kanjimap_android.core.ui.components.LoadingView
 import com.vb.kanjimap_android.core.ui.components.PrimaryButton
-import com.vb.kanjimap_android.core.ui.components.ScreenTitleText
-import com.vb.kanjimap_android.core.ui.theme.CoreSpacing
-import com.vb.kanjimap_android.core.ui.theme.Dimens
+import com.vb.kanjimap_android.core.ui.components.ScreenHeader
+import com.vb.kanjimap_android.core.ui.components.ScreenList
+import com.vb.kanjimap_android.core.ui.components.SurfaceSection
 import com.vb.kanjimap_android.feature.learning.presentation.components.LearningBlockListItem
 import com.vb.kanjimap_android.feature.learning.presentation.components.LearningEmptyState
 
@@ -32,70 +25,71 @@ fun LearnScreen(
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues()
 ) {
-    Surface(modifier = Modifier.fillMaxSize()) {
-        LazyColumn(
-            modifier = modifier
-                .fillMaxSize()
-                .statusBarsPadding()
-                .padding(contentPadding)
-                .padding(Dimens.screenContentPadding),
-            verticalArrangement = Arrangement.spacedBy(Dimens.sectionSpacing)
-        ) {
-            item {
-                ScreenTitleText("Обучение")
+    ScreenList(
+        modifier = modifier,
+        contentPadding = contentPadding
+    ) {
+        item {
+            ScreenHeader(
+                title = "Обучение",
+                subtitle = "Блоки для первичного изучения слов и кандзи"
+            )
+        }
+
+        when {
+            uiState.isLoading -> {
+                item { LoadingView(message = "Загружаем блоки") }
             }
 
-            when {
-                uiState.isLoading -> {
-                    item {
-                        LoadingView(message = "Загружаем блоки")
-                    }
+            uiState.errorMessage != null -> {
+                item {
+                    ErrorView(
+                        message = uiState.errorMessage,
+                        retryLabel = "Повторить",
+                        onRetry = onRetry
+                    )
                 }
+            }
 
-                uiState.errorMessage != null -> {
-                    item {
-                        ErrorView(
-                            message = uiState.errorMessage,
-                            retryLabel = "Повторить",
-                            onRetry = onRetry
-                        )
-                    }
-                }
-
-                !isAuthenticated -> {
-                    item {
+            !isAuthenticated -> {
+                item {
+                    SurfaceSection(title = "Доступ к обучению") {
                         LearningEmptyState(
                             title = "Войдите, чтобы открыть обучение",
                             description = "После авторизации здесь появятся блоки и режим изучения карточками.",
                             action = {
-                                PrimaryButton(onClick = onAuthClick) {
+                                PrimaryButton(
+                                    onClick = onAuthClick,
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
                                     Text("Авторизоваться")
                                 }
                             }
                         )
                     }
                 }
+            }
 
-                uiState.items.isEmpty() -> {
-                    item {
+            uiState.items.isEmpty() -> {
+                item {
+                    SurfaceSection(title = "Обучение") {
                         LearningEmptyState(
                             title = "Блоков пока нет",
                             description = "Когда они появятся на сервере, вы увидите их здесь."
                         )
                     }
                 }
+            }
 
-                else -> {
-                    items(
-                        items = uiState.items,
-                        key = { it.learningBlockId }
-                    ) { block ->
-                        LearningBlockListItem(
-                            block = block,
-                            onClick = { onBlockClick(block.learningBlockId) }
-                        )
-                    }
-                    item { Spacer(modifier = Modifier.height(CoreSpacing.xs)) }
+            else -> {
+                items(
+                    items = uiState.items,
+                    key = { it.learningBlockId }
+                ) { block ->
+                    LearningBlockListItem(
+                        block = block,
+                        onClick = { onBlockClick(block.learningBlockId) }
+                    )
                 }
             }
         }
