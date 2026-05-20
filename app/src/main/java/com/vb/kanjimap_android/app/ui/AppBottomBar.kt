@@ -10,6 +10,7 @@ import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.vb.kanjimap_android.app.navigation.BottomDestinations
+import com.vb.kanjimap_android.app.navigation.navigateToTopLevel
 
 @Composable
 fun AppBottomBar(navController: NavHostController) {
@@ -27,13 +28,7 @@ fun AppBottomBar(navController: NavHostController) {
             NavigationBarItem(
                 selected = isSelected,
                 onClick = {
-                    navController.navigate(destination.route) {
-                        popUpTo(navController.graph.startDestinationId) {
-                            saveState = true
-                        }
-                        launchSingleTop = true
-                        restoreState = true
-                    }
+                    navController.navigateToTopLevel(destination.route)
                 },
                 icon = {
                     Icon(

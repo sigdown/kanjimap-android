@@ -63,9 +63,9 @@ fun AppNavGraph(
                 sessionViewModel = sessionViewModel,
                 onAuthClick = { navController.navigate(Destination.Auth.route) },
                 onOpenReview = { navController.navigate(Destination.Review.route) },
-                onOpenBlocks = { navController.navigate(Destination.Learn.route) },
-                onOpenWords = { navController.navigate(Destination.Words.route) },
-                onOpenKanji = { navController.navigate(Destination.Kanji.route) },
+                onOpenBlocks = { navController.navigateToTopLevel(Destination.Learn.route) },
+                onOpenWords = { navController.navigateToTopLevel(Destination.Words.route) },
+                onOpenKanji = { navController.navigateToTopLevel(Destination.Kanji.route) },
                 contentPadding = innerPadding
             )
         }
