@@ -3,7 +3,6 @@ package com.vb.kanjimap_android.feature.home.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vb.kanjimap_android.feature.home.domain.usecase.GetHomeSummaryUseCase
-import com.vb.kanjimap_android.feature.home.domain.usecase.HasSavedHomeSessionUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,7 +14,6 @@ import retrofit2.HttpException
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val hasSavedHomeSessionUseCase: HasSavedHomeSessionUseCase,
     private val getHomeSummaryUseCase: GetHomeSummaryUseCase
 ) : ViewModel() {
 
@@ -24,20 +22,14 @@ class HomeViewModel @Inject constructor(
     private var hasAttemptedAuthenticatedLoad = false
 
     fun loadHome(force: Boolean = false) {
+        if (!force && hasAttemptedAuthenticatedLoad) return
+
         viewModelScope.launch {
-            val isAuthenticated = hasSavedHomeSessionUseCase()
-            if (!isAuthenticated) {
-                hasAttemptedAuthenticatedLoad = false
-                _uiState.value = HomeUiState(isGuest = true)
-                return@launch
-            }
-            if (!force && hasAttemptedAuthenticatedLoad) return@launch
             hasAttemptedAuthenticatedLoad = true
 
             _uiState.update {
                 it.copy(
                     isLoading = true,
-                    isGuest = false,
                     errorMessage = null
                 )
             }
@@ -46,25 +38,27 @@ class HomeViewModel @Inject constructor(
                 .onSuccess { summary ->
                     _uiState.value = HomeUiState(
                         isLoading = false,
-                        isGuest = false,
                         summary = summary,
                         errorMessage = null
                     )
                 }
                 .onFailure { throwable ->
                     if (throwable is HttpException && throwable.code() in listOf(401, 403)) {
-                        _uiState.value = HomeUiState(isGuest = true)
-                    } else {
-                        _uiState.update {
-                            it.copy(
-                                isLoading = false,
-                                isGuest = false,
-                                summary = null,
-                                errorMessage = throwable.message ?: "Не удалось загрузить Home"
-                            )
-                        }
+                        hasAttemptedAuthenticatedLoad = false
+                    }
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            summary = null,
+                            errorMessage = throwable.message ?: "Не удалось загрузить Home"
+                        )
                     }
                 }
         }
+    }
+
+    fun clearHome() {
+        hasAttemptedAuthenticatedLoad = false
+        _uiState.value = HomeUiState()
     }
 }

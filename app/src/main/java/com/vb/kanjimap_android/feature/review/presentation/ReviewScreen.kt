@@ -3,11 +3,17 @@ package com.vb.kanjimap_android.feature.review.presentation
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Refresh
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
 import com.vb.kanjimap_android.core.ui.components.BodyText
@@ -17,6 +23,7 @@ import com.vb.kanjimap_android.core.ui.components.MetaText
 import com.vb.kanjimap_android.core.ui.components.PrimaryButton
 import com.vb.kanjimap_android.core.ui.components.ScreenHeader
 import com.vb.kanjimap_android.core.ui.components.ScreenList
+import com.vb.kanjimap_android.core.ui.components.ScreenTitleText
 import com.vb.kanjimap_android.core.ui.components.SecondaryButton
 import com.vb.kanjimap_android.core.ui.components.SurfaceSection
 import com.vb.kanjimap_android.core.ui.theme.CoreSpacing
@@ -75,13 +82,11 @@ fun ReviewScreen(
         uiState.isCompleted -> {
             ScreenList(modifier = modifier, contentPadding = contentPadding) {
                 item {
-                    ScreenHeader(
+                    ReviewHeader(
                         title = "Повторение завершено",
-                        subtitle = "Все карточки на сегодня пройдены"
+                        subtitle = "Все карточки на сегодня пройдены",
+                        onRefresh = onRefresh
                     )
-                    SecondaryButton(onClick = onRefresh, modifier = Modifier.fillMaxWidth()) {
-                        Text("Обновить")
-                    }
                 }
                 item {
                     SurfaceSection(title = "Готово") {
@@ -99,13 +104,11 @@ fun ReviewScreen(
         uiState.isEmpty -> {
             ScreenList(modifier = modifier, contentPadding = contentPadding) {
                 item {
-                    ScreenHeader(
+                    ReviewHeader(
                         title = "На сегодня повторений нет",
-                        subtitle = "Возвращайтесь позже"
+                        subtitle = "Возвращайтесь позже",
+                        onRefresh = onRefresh
                     )
-                    SecondaryButton(onClick = onRefresh, modifier = Modifier.fillMaxWidth()) {
-                        Text("Обновить")
-                    }
                 }
                 item {
                     SurfaceSection(title = "Повторение") {
@@ -121,16 +124,14 @@ fun ReviewScreen(
             val item = uiState.currentItem ?: return
             ScreenList(modifier = modifier, contentPadding = contentPadding) {
                 item {
-                    ScreenHeader(
+                    ReviewHeader(
                         title = when (item.itemType) {
                             ReviewItemType.WORD -> item.word?.writingForm ?: "Слово"
                             ReviewItemType.KANJI -> item.kanji?.literal ?: "Кандзи"
                         },
-                        subtitle = uiState.progressText
+                        subtitle = uiState.progressText,
+                        onRefresh = onRefresh
                     )
-                    SecondaryButton(onClick = onRefresh, modifier = Modifier.fillMaxWidth()) {
-                        Text("Обновить")
-                    }
                 }
 
                 item {
@@ -170,6 +171,36 @@ fun ReviewScreen(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun ReviewHeader(
+    title: String,
+    subtitle: String,
+    onRefresh: () -> Unit
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(CoreSpacing.xs)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            ScreenTitleText(
+                text = title,
+                modifier = Modifier.weight(1f)
+            )
+            IconButton(onClick = onRefresh) {
+                Icon(
+                    imageVector = Icons.Outlined.Refresh,
+                    contentDescription = "Обновить"
+                )
+            }
+        }
+        MetaText(subtitle)
     }
 }
 

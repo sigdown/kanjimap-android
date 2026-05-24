@@ -26,8 +26,10 @@ fun HomeRoute(
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
 
     LaunchedEffect(sessionState.authState) {
-        if (sessionState.authState == SessionAuthState.AUTHENTICATED) {
-            viewModel.loadHome()
+        when (sessionState.authState) {
+            SessionAuthState.AUTHENTICATED -> viewModel.loadHome()
+            SessionAuthState.GUEST -> viewModel.clearHome()
+            SessionAuthState.CHECKING -> Unit
         }
     }
 
@@ -38,6 +40,7 @@ fun HomeRoute(
 
     HomeScreen(
         uiState = uiState,
+        isGuest = sessionState.authState == SessionAuthState.GUEST,
         onAuthClick = onAuthClick,
         onOpenReview = onOpenReview,
         onOpenBlocks = onOpenBlocks,
