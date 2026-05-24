@@ -1,7 +1,10 @@
 package com.vb.kanjimap_android.core.common
 
+import com.vb.kanjimap_android.BuildConfig
+
+
 object Constants {
-    const val BASE_URL = "http://127.0.0.1:8080/api/"
+    const val BASE_URL = BuildConfig.HIDDEN_API_URL
     const val CONNECT_TIMEOUT_SECONDS = 15L
     const val READ_TIMEOUT_SECONDS = 15L
     const val WRITE_TIMEOUT_SECONDS = 15L

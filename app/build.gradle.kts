@@ -1,9 +1,19 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt.android)
+}
+
+val localProperties = Properties().apply {
+    val localPropertiesFile = rootProject.file("local.properties")
+    if (localPropertiesFile.exists()) {
+        load(FileInputStream(localPropertiesFile))
+    }
 }
 
 android {
@@ -18,6 +28,13 @@ android {
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
+
+        val apiUrl = localProperties.getProperty("API_BASE_URL") ?: "http://127.0.0.1:8080/api/"
+        buildConfigField("String", "HIDDEN_API_URL", apiUrl)
+
+        buildFeatures {
+            buildConfig = true
+        }
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
