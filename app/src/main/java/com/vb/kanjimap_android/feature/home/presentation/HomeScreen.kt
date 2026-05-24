@@ -51,7 +51,10 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues()
 ) {
-    Surface(modifier = modifier.fillMaxSize()) {
+    Surface(
+        modifier = modifier.fillMaxSize(),
+        color = MaterialTheme.colorScheme.background
+    ) {
         when {
             uiState.isLoading -> {
                 LoadingView(message = "Загружаем Home")
