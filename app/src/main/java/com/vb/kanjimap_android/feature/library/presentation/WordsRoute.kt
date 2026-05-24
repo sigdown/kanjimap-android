@@ -18,7 +18,7 @@ fun WordsRoute(
     WordsScreen(
         uiState = uiState.wordSearch,
         onQueryChange = viewModel::updateWordsQuery,
-        onSearchClick = viewModel::searchWords,
+        onSearch = viewModel::searchWords,
         onWordClick = onWordClick,
         modifier = modifier,
         contentPadding = contentPadding

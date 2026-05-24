@@ -8,6 +8,9 @@ import com.vb.kanjimap_android.feature.library.domain.usecase.SearchKanjiUseCase
 import com.vb.kanjimap_android.feature.library.domain.usecase.SearchWordsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -25,11 +28,19 @@ class LibraryViewModel @Inject constructor(
     private val getKanjiDetailsUseCase: GetKanjiDetailsUseCase
 ) : ViewModel() {
 
+    private companion object {
+        const val SEARCH_DEBOUNCE_MS = 300L
+        const val SEARCH_SUGGESTIONS_LIMIT = 10
+    }
+
     private val _uiState = MutableStateFlow(LibraryUiState())
     val uiState: StateFlow<LibraryUiState> = _uiState.asStateFlow()
 
     private val _events = MutableSharedFlow<String>(extraBufferCapacity = 1)
     val events: SharedFlow<String> = _events.asSharedFlow()
+
+    private var wordSearchJob: Job? = null
+    private var kanjiSearchJob: Job? = null
 
     fun updateWordsQuery(query: String) {
         _uiState.update {
@@ -40,6 +51,8 @@ class LibraryViewModel @Inject constructor(
                 )
             )
         }
+
+        scheduleWordsSearch(query)
     }
 
     fun updateKanjiQuery(query: String) {
@@ -51,119 +64,159 @@ class LibraryViewModel @Inject constructor(
                 )
             )
         }
+
+        scheduleKanjiSearch(query)
     }
 
     fun searchWords(query: String = _uiState.value.wordSearch.query) {
-        val normalizedQuery = query.trim()
-        if (normalizedQuery.isBlank()) {
-            _uiState.update {
-                it.copy(
-                    wordSearch = it.wordSearch.copy(
-                        query = query,
-                        items = emptyList(),
-                        isLoading = false,
-                        errorMessage = null,
-                        hasSearched = false
-                    )
-                )
-            }
-            return
-        }
-
-        viewModelScope.launch {
-            _uiState.update {
-                it.copy(
-                    wordSearch = it.wordSearch.copy(
-                        query = normalizedQuery,
-                        isLoading = true,
-                        errorMessage = null,
-                        hasSearched = true
-                    )
-                )
-            }
-
-            runCatching { searchWordsUseCase(normalizedQuery) }
-                .onSuccess { words ->
-                    _uiState.update {
-                        it.copy(
-                            wordSearch = it.wordSearch.copy(
-                                items = words,
-                                isLoading = false,
-                                errorMessage = null,
-                                hasSearched = true
-                            )
-                        )
-                    }
-                }
-                .onFailure { throwable ->
-                    _uiState.update {
-                        it.copy(
-                            wordSearch = it.wordSearch.copy(
-                                items = emptyList(),
-                                isLoading = false,
-                                errorMessage = throwable.message ?: "Не удалось загрузить слова",
-                                hasSearched = true
-                            )
-                        )
-                    }
-                }
+        wordSearchJob?.cancel()
+        wordSearchJob = viewModelScope.launch {
+            searchWordsInternal(query)
         }
     }
 
     fun searchKanji(query: String = _uiState.value.kanjiSearch.query) {
-        val normalizedQuery = query.trim()
-        if (normalizedQuery.isBlank()) {
-            _uiState.update {
-                it.copy(
-                    kanjiSearch = it.kanjiSearch.copy(
-                        query = query,
-                        items = emptyList(),
-                        isLoading = false,
-                        errorMessage = null,
-                        hasSearched = false
-                    )
-                )
-            }
+        kanjiSearchJob?.cancel()
+        kanjiSearchJob = viewModelScope.launch {
+            searchKanjiInternal(query)
+        }
+    }
+
+    private fun scheduleWordsSearch(query: String) {
+        wordSearchJob?.cancel()
+        if (query.isBlank()) {
+            clearWordSearch(query)
             return
         }
 
-        viewModelScope.launch {
+        wordSearchJob = viewModelScope.launch {
+            delay(SEARCH_DEBOUNCE_MS)
+            searchWordsInternal(query)
+        }
+    }
+
+    private fun scheduleKanjiSearch(query: String) {
+        kanjiSearchJob?.cancel()
+        if (query.isBlank()) {
+            clearKanjiSearch(query)
+            return
+        }
+
+        kanjiSearchJob = viewModelScope.launch {
+            delay(SEARCH_DEBOUNCE_MS)
+            searchKanjiInternal(query)
+        }
+    }
+
+    private suspend fun searchWordsInternal(query: String) {
+        val normalizedQuery = query.trim()
+        if (normalizedQuery.isBlank()) {
+            clearWordSearch(query)
+            return
+        }
+
+        _uiState.update {
+            it.copy(
+                wordSearch = it.wordSearch.copy(
+                    query = normalizedQuery,
+                    isLoading = true,
+                    errorMessage = null
+                )
+            )
+        }
+
+        try {
+            val words = searchWordsUseCase(normalizedQuery).take(SEARCH_SUGGESTIONS_LIMIT)
             _uiState.update {
                 it.copy(
-                    kanjiSearch = it.kanjiSearch.copy(
-                        query = normalizedQuery,
-                        isLoading = true,
-                        errorMessage = null,
-                        hasSearched = true
+                    wordSearch = it.wordSearch.copy(
+                        items = words,
+                        isLoading = false,
+                        errorMessage = null
                     )
                 )
             }
+        } catch (exception: CancellationException) {
+            throw exception
+        } catch (throwable: Throwable) {
+            _uiState.update {
+                it.copy(
+                    wordSearch = it.wordSearch.copy(
+                        items = emptyList(),
+                        isLoading = false,
+                        errorMessage = throwable.message ?: "Не удалось загрузить слова"
+                    )
+                )
+            }
+        }
+    }
 
-            runCatching { searchKanjiUseCase(normalizedQuery) }
-                .onSuccess { kanji ->
-                    _uiState.update {
-                        it.copy(
-                            kanjiSearch = it.kanjiSearch.copy(
-                                items = kanji,
-                                isLoading = false,
-                                errorMessage = null,
-                                hasSearched = true
-                            )
-                        )
-                    }
-                }
-                .onFailure { throwable ->
-                    _uiState.update {
-                        it.copy(
-                            kanjiSearch = it.kanjiSearch.copy(
-                                items = emptyList(),
-                                isLoading = false,
-                                errorMessage = throwable.message ?: "Не удалось загрузить кандзи",
-                                hasSearched = true
-                            )
-                        )
-                    }
-                }
+    private suspend fun searchKanjiInternal(query: String) {
+        val normalizedQuery = query.trim()
+        if (normalizedQuery.isBlank()) {
+            clearKanjiSearch(query)
+            return
+        }
+
+        _uiState.update {
+            it.copy(
+                kanjiSearch = it.kanjiSearch.copy(
+                    query = normalizedQuery,
+                    isLoading = true,
+                    errorMessage = null
+                )
+            )
+        }
+
+        try {
+            val kanji = searchKanjiUseCase(normalizedQuery).take(SEARCH_SUGGESTIONS_LIMIT)
+            _uiState.update {
+                it.copy(
+                    kanjiSearch = it.kanjiSearch.copy(
+                        items = kanji,
+                        isLoading = false,
+                        errorMessage = null
+                    )
+                )
+            }
+        } catch (exception: CancellationException) {
+            throw exception
+        } catch (throwable: Throwable) {
+            _uiState.update {
+                it.copy(
+                    kanjiSearch = it.kanjiSearch.copy(
+                        items = emptyList(),
+                        isLoading = false,
+                        errorMessage = throwable.message ?: "Не удалось загрузить кандзи"
+                    )
+                )
+            }
+        }
+    }
+
+    private fun clearWordSearch(query: String) {
+        _uiState.update {
+            it.copy(
+                wordSearch = it.wordSearch.copy(
+                    query = query,
+                    items = emptyList(),
+                    isLoading = false,
+                    errorMessage = null
+                )
+            )
+        }
+    }
+
+    private fun clearKanjiSearch(query: String) {
+        _uiState.update {
+            it.copy(
+                kanjiSearch = it.kanjiSearch.copy(
+                    query = query,
+                    items = emptyList(),
+                    isLoading = false,
+                    errorMessage = null
+                )
+            )
         }
     }
 

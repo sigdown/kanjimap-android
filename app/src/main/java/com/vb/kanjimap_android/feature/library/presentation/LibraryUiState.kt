@@ -16,16 +16,14 @@ data class WordSearchUiState(
     val query: String = "",
     val items: List<Word> = emptyList(),
     val isLoading: Boolean = false,
-    val errorMessage: String? = null,
-    val hasSearched: Boolean = false
+    val errorMessage: String? = null
 )
 
 data class KanjiSearchUiState(
     val query: String = "",
     val items: List<Kanji> = emptyList(),
     val isLoading: Boolean = false,
-    val errorMessage: String? = null,
-    val hasSearched: Boolean = false
+    val errorMessage: String? = null
 )
 
 data class WordDetailsUiState(

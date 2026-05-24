@@ -9,24 +9,33 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import com.vb.kanjimap_android.core.ui.components.MetaText
 import com.vb.kanjimap_android.core.ui.components.SectionCard
 import com.vb.kanjimap_android.core.ui.components.SectionTitleText
@@ -35,36 +44,148 @@ import com.vb.kanjimap_android.core.ui.theme.Dimens
 import com.vb.kanjimap_android.feature.library.domain.model.Kanji
 import com.vb.kanjimap_android.feature.library.domain.model.Word
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LibrarySearchField(
+fun <T> LibrarySearchField(
     value: String,
     label: String,
     onValueChange: (String) -> Unit,
+    items: List<T>,
+    isLoading: Boolean,
+    errorMessage: String?,
+    emptyMessage: String,
     onSearch: () -> Unit,
+    onItemClick: (T) -> Unit,
+    itemContent: @Composable (T) -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true
 ) {
-    OutlinedTextField(
-        value = value,
-        onValueChange = onValueChange,
-        modifier = modifier.fillMaxWidth(),
-        enabled = enabled,
-        singleLine = true,
-        label = { Text(label) },
-        trailingIcon = {
-            IconButton(
-                onClick = onSearch,
-                enabled = enabled
-            ) {
-                Icon(
-                    imageVector = Icons.Outlined.Search,
-                    contentDescription = "Поиск"
-                )
-            }
+    var expanded by rememberSaveable { mutableStateOf(false) }
+    val showEmptyState = value.isNotBlank() && !isLoading && errorMessage == null && items.isEmpty()
+    val hasDropdownContent = isLoading || errorMessage != null || items.isNotEmpty() || showEmptyState
+
+    LaunchedEffect(value, isLoading, errorMessage, items) {
+        expanded = value.isNotBlank() && hasDropdownContent
+    }
+
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { shouldExpand ->
+            expanded = shouldExpand && hasDropdownContent
         },
-        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-        keyboardActions = KeyboardActions(onSearch = { onSearch() })
-    )
+        modifier = modifier.fillMaxWidth()
+    ) {
+        OutlinedTextField(
+            value = value,
+            onValueChange = onValueChange,
+            modifier = Modifier
+                .fillMaxWidth()
+                .menuAnchor(
+                    type = MenuAnchorType.PrimaryEditable,
+                    enabled = enabled
+                ),
+            enabled = enabled,
+            singleLine = true,
+            label = { Text(label) },
+            trailingIcon = {
+                if (isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.padding(end = 12.dp),
+                        strokeWidth = 2.dp
+                    )
+                } else {
+                    Icon(
+                        imageVector = Icons.Outlined.Search,
+                        contentDescription = null
+                    )
+                }
+            },
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+            keyboardActions = KeyboardActions(onSearch = { onSearch() })
+        )
+
+        ExposedDropdownMenu(
+            expanded = expanded && hasDropdownContent,
+            onDismissRequest = { expanded = false }
+        ) {
+            when {
+                isLoading -> {
+                    DropdownMenuItem(
+                        text = { Text("Ищем...") },
+                        onClick = {}
+                    )
+                }
+
+                errorMessage != null -> {
+                    DropdownMenuItem(
+                        text = { Text(errorMessage) },
+                        onClick = onSearch
+                    )
+                }
+
+                showEmptyState -> {
+                    DropdownMenuItem(
+                        text = { Text(emptyMessage) },
+                        onClick = { expanded = false }
+                    )
+                }
+
+                else -> items.forEach { item ->
+                    DropdownMenuItem(
+                        text = { itemContent(item) },
+                        onClick = {
+                            expanded = false
+                            onItemClick(item)
+                        }
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun WordSuggestionItem(word: Word) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(2.dp)
+    ) {
+        Text(
+            text = word.writingForm,
+            style = MaterialTheme.typography.bodyLarge
+        )
+        Text(
+            text = listOf(word.readingKana, word.jlptLevel, word.topicName)
+                .filterNotNull()
+                .joinToString(" • "),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+    }
+}
+
+@Composable
+fun KanjiSuggestionItem(kanji: Kanji) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(CoreSpacing.sm),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = kanji.literal,
+            style = MaterialTheme.typography.titleMedium
+        )
+        Text(
+            text = listOfNotNull(
+                kanji.strokeCount?.let { "$it черт" },
+                kanji.jlptLevel
+            ).joinToString(" • ").ifBlank { "Открыть карточку" },
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+    }
 }
 
 @Composable

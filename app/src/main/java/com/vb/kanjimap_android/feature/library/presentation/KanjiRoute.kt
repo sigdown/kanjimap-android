@@ -18,7 +18,7 @@ fun KanjiRoute(
     KanjiScreen(
         uiState = uiState.kanjiSearch,
         onQueryChange = viewModel::updateKanjiQuery,
-        onSearchClick = viewModel::searchKanji,
+        onSearch = viewModel::searchKanji,
         onKanjiClick = onKanjiClick,
         modifier = modifier,
         contentPadding = contentPadding
