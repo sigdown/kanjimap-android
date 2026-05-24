@@ -32,6 +32,7 @@ fun LearnRoute(
         uiState = uiState.learn,
         onBlockClick = onBlockClick,
         onAuthClick = onAuthClick,
+        onRefresh = { learningViewModel.loadBlocks(force = true) },
         onRetry = { learningViewModel.loadBlocks(force = true) },
         modifier = modifier,
         contentPadding = contentPadding

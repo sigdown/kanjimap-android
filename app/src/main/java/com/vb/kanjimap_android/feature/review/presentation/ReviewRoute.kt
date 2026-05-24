@@ -22,6 +22,7 @@ fun ReviewRoute(
         onAuthClick = onAuthClick,
         onClose = onClose,
         onGoHome = onGoHome,
+        onRefresh = viewModel::loadReview,
         onRetry = viewModel::loadReview,
         onShowAnswer = viewModel::revealAnswer,
         onAnswerChange = viewModel::updateAnswerInput,

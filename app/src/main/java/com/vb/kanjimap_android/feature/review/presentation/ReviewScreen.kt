@@ -30,6 +30,7 @@ fun ReviewScreen(
     onAuthClick: () -> Unit,
     onClose: () -> Unit,
     onGoHome: () -> Unit,
+    onRefresh: () -> Unit,
     onRetry: () -> Unit,
     onShowAnswer: () -> Unit,
     onAnswerChange: (String) -> Unit,
@@ -78,6 +79,9 @@ fun ReviewScreen(
                         title = "Повторение завершено",
                         subtitle = "Все карточки на сегодня пройдены"
                     )
+                    SecondaryButton(onClick = onRefresh, modifier = Modifier.fillMaxWidth()) {
+                        Text("Обновить")
+                    }
                 }
                 item {
                     SurfaceSection(title = "Готово") {
@@ -99,6 +103,9 @@ fun ReviewScreen(
                         title = "На сегодня повторений нет",
                         subtitle = "Возвращайтесь позже"
                     )
+                    SecondaryButton(onClick = onRefresh, modifier = Modifier.fillMaxWidth()) {
+                        Text("Обновить")
+                    }
                 }
                 item {
                     SurfaceSection(title = "Повторение") {
@@ -121,6 +128,9 @@ fun ReviewScreen(
                         },
                         subtitle = uiState.progressText
                     )
+                    SecondaryButton(onClick = onRefresh, modifier = Modifier.fillMaxWidth()) {
+                        Text("Обновить")
+                    }
                 }
 
                 item {

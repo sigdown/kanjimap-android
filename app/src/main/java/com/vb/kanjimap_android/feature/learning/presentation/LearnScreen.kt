@@ -1,16 +1,23 @@
 package com.vb.kanjimap_android.feature.learning.presentation
 
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.vb.kanjimap_android.core.ui.components.ErrorView
 import com.vb.kanjimap_android.core.ui.components.LoadingView
+import com.vb.kanjimap_android.core.ui.components.MetaText
 import com.vb.kanjimap_android.core.ui.components.PrimaryButton
-import com.vb.kanjimap_android.core.ui.components.ScreenHeader
 import com.vb.kanjimap_android.core.ui.components.ScreenList
+import com.vb.kanjimap_android.core.ui.components.ScreenTitleText
 import com.vb.kanjimap_android.core.ui.components.SurfaceSection
 import com.vb.kanjimap_android.feature.learning.presentation.components.LearningBlockListItem
 import com.vb.kanjimap_android.feature.learning.presentation.components.LearningEmptyState
@@ -22,26 +29,45 @@ fun LearnScreen(
     uiState: LearnUiState,
     onBlockClick: (Long) -> Unit,
     onAuthClick: () -> Unit,
+    onRefresh: () -> Unit,
     onRetry: () -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues()
 ) {
+    if (authState == SessionAuthState.CHECKING) {
+        LoadingView(message = "Проверяем сессию")
+        return
+    }
+
+    if (uiState.isLoading) {
+        LoadingView(message = "Загружаем блоки")
+        return
+    }
+
     ScreenList(
         modifier = modifier,
         contentPadding = contentPadding
     ) {
         item {
-            ScreenHeader(
-                title = "Обучение",
-                subtitle = "Блоки для первичного изучения слов и кандзи"
-            )
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    ScreenTitleText("Обучение")
+                    TextButton(onClick = onRefresh) {
+                        Text("Обновить")
+                    }
+                }
+                MetaText("Блоки для первичного изучения слов и кандзи")
+            }
         }
 
         when {
-            authState == SessionAuthState.CHECKING -> {
-                item { LoadingView(message = "Проверяем сессию") }
-            }
-
             authState == SessionAuthState.GUEST -> {
                 item {
                     SurfaceSection(title = "Доступ к обучению") {
@@ -59,10 +85,6 @@ fun LearnScreen(
                         )
                     }
                 }
-            }
-
-            uiState.isLoading -> {
-                item { LoadingView(message = "Загружаем блоки") }
             }
 
             uiState.errorMessage != null -> {

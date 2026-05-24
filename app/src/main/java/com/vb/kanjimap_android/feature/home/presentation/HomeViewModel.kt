@@ -21,14 +21,18 @@ class HomeViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
+    private var hasAttemptedAuthenticatedLoad = false
 
-    fun loadHome() {
+    fun loadHome(force: Boolean = false) {
         viewModelScope.launch {
             val isAuthenticated = hasSavedHomeSessionUseCase()
             if (!isAuthenticated) {
+                hasAttemptedAuthenticatedLoad = false
                 _uiState.value = HomeUiState(isGuest = true)
                 return@launch
             }
+            if (!force && hasAttemptedAuthenticatedLoad) return@launch
+            hasAttemptedAuthenticatedLoad = true
 
             _uiState.update {
                 it.copy(

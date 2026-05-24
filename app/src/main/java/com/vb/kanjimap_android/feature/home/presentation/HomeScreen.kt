@@ -16,6 +16,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,6 +49,7 @@ fun HomeScreen(
     onOpenWords: () -> Unit,
     onOpenKanji: () -> Unit,
     onRetry: () -> Unit,
+    onRefresh: () -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues()
 ) {
@@ -74,6 +76,7 @@ fun HomeScreen(
             uiState.isGuest -> {
                 GuestHomeContent(
                     onAuthClick = onAuthClick,
+                    onRefresh = onRefresh,
                     contentPadding = contentPadding
                 )
             }
@@ -86,6 +89,7 @@ fun HomeScreen(
                     onOpenBlocks = onOpenBlocks,
                     onOpenWords = onOpenWords,
                     onOpenKanji = onOpenKanji,
+                    onRefresh = onRefresh,
                     contentPadding = contentPadding
                 )
             }
@@ -96,6 +100,7 @@ fun HomeScreen(
 @Composable
 private fun GuestHomeContent(
     onAuthClick: () -> Unit,
+    onRefresh: () -> Unit,
     contentPadding: PaddingValues
 ) {
     LazyColumn(
@@ -111,7 +116,8 @@ private fun GuestHomeContent(
         item {
             HomeHeader(
                 username = "друг",
-                subtitle = "Персональная зона обучения и повторения"
+                subtitle = "Персональная зона обучения и повторения",
+                onRefresh = onRefresh
             )
         }
 
@@ -126,6 +132,7 @@ private fun GuestHomeContent(
                 }
             }
         }
+
     }
 }
 
@@ -136,6 +143,7 @@ private fun HomeSummaryContent(
     onOpenBlocks: () -> Unit,
     onOpenWords: () -> Unit,
     onOpenKanji: () -> Unit,
+    onRefresh: () -> Unit,
     contentPadding: PaddingValues
 ) {
     LazyColumn(
@@ -151,7 +159,8 @@ private fun HomeSummaryContent(
         item {
             HomeHeader(
                 username = summary.username,
-                subtitle = "Ваши повторения и обучение на сегодня"
+                subtitle = "Ваши повторения и обучение на сегодня",
+                onRefresh = onRefresh
             )
         }
 
@@ -236,19 +245,30 @@ private fun HomeSummaryContent(
                 }
             }
         }
+
     }
 }
 
 @Composable
 private fun HomeHeader(
     username: String,
-    subtitle: String
+    subtitle: String,
+    onRefresh: () -> Unit
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(6.dp)
     ) {
-        ScreenTitleText("Привет, $username")
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            ScreenTitleText("Привет, $username")
+            TextButton(onClick = onRefresh) {
+                Text("Обновить")
+            }
+        }
         MetaText(subtitle)
     }
 }
