@@ -110,6 +110,7 @@ fun AppNavGraph(
             val sessionViewModel: SessionViewModel = hiltViewModel(parentEntry)
             AuthRoute(
                 sessionViewModel = sessionViewModel,
+                onBackClick = { navController.popBackStack() },
                 onAuthSuccess = {
                     val returned = navController.popBackStack()
                     if (!returned) {
@@ -125,6 +126,7 @@ fun AppNavGraph(
         composable(Destination.Review.route) {
             ReviewRoute(
                 onAuthClick = { navController.navigate(Destination.Auth.route) },
+                onBackClick = { navController.popBackStack() },
                 onClose = { navController.popBackStack() },
                 onGoHome = {
                     navController.navigate(Destination.Home.route) {
@@ -137,6 +139,7 @@ fun AppNavGraph(
         }
         composable(Destination.SavedWords.route) {
             SavedWordsRoute(
+                onBackClick = { navController.popBackStack() },
                 onWordClick = { wordId ->
                     navController.navigate(Destination.WordDetails.createRoute(wordId))
                 },
@@ -145,6 +148,7 @@ fun AppNavGraph(
         }
         composable(Destination.SavedKanji.route) {
             SavedKanjiRoute(
+                onBackClick = { navController.popBackStack() },
                 onKanjiClick = { kanjiId ->
                     navController.navigate(Destination.KanjiDetails.createRoute(kanjiId))
                 },
@@ -173,6 +177,7 @@ fun AppNavGraph(
             if (wordId != null) {
                 WordDetailsRoute(
                     wordId = wordId,
+                    onBackClick = { navController.popBackStack() },
                     onKanjiClick = { kanjiId ->
                         navController.navigate(Destination.KanjiDetails.createRoute(kanjiId))
                     },
@@ -191,6 +196,7 @@ fun AppNavGraph(
             if (kanjiId != null) {
                 KanjiDetailsRoute(
                     kanjiId = kanjiId,
+                    onBackClick = { navController.popBackStack() },
                     onWordClick = { wordId ->
                         navController.navigate(Destination.WordDetails.createRoute(wordId))
                     },
@@ -206,6 +212,7 @@ fun AppNavGraph(
             if (blockId != null) {
                 BlockDetailsRoute(
                     blockId = blockId,
+                    onBackClick = { navController.popBackStack() },
                     onStudyClick = { mode ->
                         navController.navigate(Destination.Study.createRoute(blockId, mode.value))
                     },
@@ -229,6 +236,7 @@ fun AppNavGraph(
                 StudyRoute(
                     blockId = blockId,
                     mode = mode,
+                    onBackClick = { navController.popBackStack() },
                     contentPadding = innerPadding
                 )
             }

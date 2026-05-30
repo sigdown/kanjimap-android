@@ -13,6 +13,7 @@ import com.vb.kanjimap_android.feature.library.presentation.components.LibraryEm
 @Composable
 fun SavedKanjiScreen(
     uiState: SavedKanjiUiState,
+    onBackClick: () -> Unit,
     onKanjiClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues()
@@ -24,7 +25,8 @@ fun SavedKanjiScreen(
         item {
             ScreenHeader(
                 title = "Сохранённые кандзи",
-                subtitle = "Офлайн-карточки кандзи из Room"
+                subtitle = "Офлайн-карточки кандзи из Room",
+                onBackClick = onBackClick
             )
         }
 

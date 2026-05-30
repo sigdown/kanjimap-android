@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.collectLatest
 @Composable
 fun WordDetailsRoute(
     wordId: Long,
+    onBackClick: () -> Unit,
     onKanjiClick: (Long) -> Unit,
     onRelatedWordClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
@@ -40,6 +41,7 @@ fun WordDetailsRoute(
     ) {
         WordDetailsScreen(
             uiState = uiState.wordDetails,
+            onBackClick = onBackClick,
             onRetry = { viewModel.loadWordDetails(wordId) },
             onSaveClick = viewModel::onSaveWordClick,
             onKanjiClick = onKanjiClick,

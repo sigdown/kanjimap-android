@@ -12,6 +12,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 fun StudyRoute(
     blockId: Long,
     mode: StudyMode,
+    onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues()
 ) {
@@ -30,6 +31,7 @@ fun StudyRoute(
 
     StudyScreen(
         uiState = uiState.study,
+        onBackClick = onBackClick,
         onShowAnswer = viewModel::showAnswer,
         onPreviousClick = viewModel::previousCard,
         onNextClick = viewModel::nextCard,

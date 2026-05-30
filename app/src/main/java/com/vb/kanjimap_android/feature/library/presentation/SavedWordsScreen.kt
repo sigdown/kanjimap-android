@@ -13,6 +13,7 @@ import com.vb.kanjimap_android.feature.library.presentation.components.WordListI
 @Composable
 fun SavedWordsScreen(
     uiState: SavedWordsUiState,
+    onBackClick: () -> Unit,
     onWordClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues()
@@ -24,7 +25,8 @@ fun SavedWordsScreen(
         item {
             ScreenHeader(
                 title = "Сохранённые слова",
-                subtitle = "Офлайн-карточки слов из Room"
+                subtitle = "Офлайн-карточки слов из Room",
+                onBackClick = onBackClick
             )
         }
 

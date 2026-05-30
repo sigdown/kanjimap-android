@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.collectLatest
 @Composable
 fun KanjiDetailsRoute(
     kanjiId: Long,
+    onBackClick: () -> Unit,
     onWordClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues()
@@ -39,6 +40,7 @@ fun KanjiDetailsRoute(
     ) {
         KanjiDetailsScreen(
             uiState = uiState.kanjiDetails,
+            onBackClick = onBackClick,
             onRetry = { viewModel.loadKanjiDetails(kanjiId) },
             onSaveClick = viewModel::onSaveKanjiClick,
             onWordClick = onWordClick,

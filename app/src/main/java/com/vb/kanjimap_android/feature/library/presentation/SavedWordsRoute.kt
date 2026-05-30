@@ -8,6 +8,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 @Composable
 fun SavedWordsRoute(
+    onBackClick: () -> Unit,
     onWordClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues()
@@ -17,6 +18,7 @@ fun SavedWordsRoute(
 
     SavedWordsScreen(
         uiState = uiState.savedWords,
+        onBackClick = onBackClick,
         onWordClick = onWordClick,
         modifier = modifier,
         contentPadding = contentPadding

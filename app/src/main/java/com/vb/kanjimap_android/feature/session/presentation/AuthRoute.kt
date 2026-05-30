@@ -9,6 +9,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 @Composable
 fun AuthRoute(
     sessionViewModel: SessionViewModel,
+    onBackClick: () -> Unit,
     onAuthSuccess: () -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues()
@@ -26,6 +27,7 @@ fun AuthRoute(
         onLogin = sessionViewModel::login,
         onRegister = sessionViewModel::register,
         onSwitchMode = sessionViewModel::setRegisterMode,
+        onBackClick = onBackClick,
         modifier = modifier,
         contentPadding = contentPadding
     )

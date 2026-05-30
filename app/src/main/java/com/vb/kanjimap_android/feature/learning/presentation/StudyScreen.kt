@@ -22,6 +22,7 @@ import com.vb.kanjimap_android.feature.learning.presentation.components.StudyCar
 @Composable
 fun StudyScreen(
     uiState: StudyUiState,
+    onBackClick: () -> Unit,
     onShowAnswer: () -> Unit,
     onPreviousClick: () -> Unit,
     onNextClick: () -> Unit,
@@ -58,7 +59,8 @@ fun StudyScreen(
                 item {
                     ScreenHeader(
                         title = "Изучение",
-                        subtitle = uiState.progressText
+                        subtitle = uiState.progressText,
+                        onBackClick = onBackClick
                     )
                 }
 

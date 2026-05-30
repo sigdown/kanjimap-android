@@ -41,6 +41,7 @@ fun AuthScreen(
     onLogin: (login: String, password: String) -> Unit,
     onRegister: (username: String, email: String, password: String) -> Unit,
     onSwitchMode: (isRegisterMode: Boolean) -> Unit,
+    onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues()
 ) {
@@ -73,7 +74,8 @@ fun AuthScreen(
                         "Создайте аккаунт, чтобы открыть обучение и повторение"
                     } else {
                         "Войдите, чтобы открыть персональную зону"
-                    }
+                    },
+                    onBackClick = onBackClick
                 )
 
                 SurfaceSection(title = if (isRegisterMode) "Данные аккаунта" else "Вход") {
@@ -201,6 +203,7 @@ private fun AuthScreenPreview() {
             onLogin = { _, _ -> },
             onRegister = { _, _, _ -> },
             onSwitchMode = {},
+            onBackClick = {},
             contentPadding = PaddingValues()
         )
     }
@@ -217,6 +220,7 @@ private fun AuthScreenRegisterPreview() {
             onLogin = { _, _ -> },
             onRegister = { _, _, _ -> },
             onSwitchMode = {},
+            onBackClick = {},
             contentPadding = PaddingValues()
         )
     }

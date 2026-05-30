@@ -8,6 +8,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 @Composable
 fun SavedKanjiRoute(
+    onBackClick: () -> Unit,
     onKanjiClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues()
@@ -17,6 +18,7 @@ fun SavedKanjiRoute(
 
     SavedKanjiScreen(
         uiState = uiState.savedKanji,
+        onBackClick = onBackClick,
         onKanjiClick = onKanjiClick,
         modifier = modifier,
         contentPadding = contentPadding

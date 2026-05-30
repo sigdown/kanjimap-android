@@ -10,6 +10,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 @Composable
 fun BlockDetailsRoute(
     blockId: Long,
+    onBackClick: () -> Unit,
     onStudyClick: (StudyMode) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues()
@@ -23,6 +24,7 @@ fun BlockDetailsRoute(
 
     BlockDetailsScreen(
         uiState = uiState.blockDetails,
+        onBackClick = onBackClick,
         onRetry = { viewModel.loadBlockDetails(blockId, force = true) },
         onStudyWordsClick = { onStudyClick(StudyMode.WORDS) },
         onStudyKanjiClick = { onStudyClick(StudyMode.KANJI) },

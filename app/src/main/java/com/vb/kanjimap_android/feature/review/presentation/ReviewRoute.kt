@@ -9,6 +9,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 @Composable
 fun ReviewRoute(
     onAuthClick: () -> Unit,
+    onBackClick: () -> Unit,
     onClose: () -> Unit,
     onGoHome: () -> Unit,
     modifier: Modifier = Modifier,
@@ -20,6 +21,7 @@ fun ReviewRoute(
     ReviewScreen(
         uiState = uiState,
         onAuthClick = onAuthClick,
+        onBackClick = onBackClick,
         onClose = onClose,
         onGoHome = onGoHome,
         onRefresh = viewModel::loadReview,

@@ -1,19 +1,13 @@
 package com.vb.kanjimap_android.feature.library.presentation
 
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Save
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import com.vb.kanjimap_android.core.ui.components.MetaText
-import com.vb.kanjimap_android.core.ui.components.ScreenTitleText
 import com.vb.kanjimap_android.core.ui.components.ScreenHeader
 import com.vb.kanjimap_android.core.ui.components.ScreenList
 import com.vb.kanjimap_android.core.ui.components.SurfaceSection
@@ -35,23 +29,18 @@ fun WordsScreen(
         contentPadding = contentPadding
     ) {
         item {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                ScreenTitleText(
-                    text = "Слова",
-                    modifier = Modifier.weight(1f)
-                )
-                IconButton(onClick = onOpenSaved) {
-                    Icon(
-                        imageVector = Icons.Outlined.Save,
-                        contentDescription = "Сохранённые слова"
-                    )
+            ScreenHeader(
+                title = "Слова",
+                subtitle = "Поиск слов, чтений и тематик",
+                actions = {
+                    IconButton(onClick = onOpenSaved) {
+                        Icon(
+                            imageVector = Icons.Outlined.Save,
+                            contentDescription = "Сохранённые слова"
+                        )
+                    }
                 }
-            }
-            MetaText("Поиск слов, чтений и тематик")
+            )
         }
 
         item {

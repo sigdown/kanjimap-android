@@ -5,13 +5,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.vb.kanjimap_android.core.ui.components.BodyText
 import com.vb.kanjimap_android.core.ui.components.ErrorView
 import com.vb.kanjimap_android.core.ui.components.LoadingView
 import com.vb.kanjimap_android.core.ui.components.MetaText
-import com.vb.kanjimap_android.core.ui.components.PrimaryButton
 import com.vb.kanjimap_android.core.ui.components.ScreenHeader
 import com.vb.kanjimap_android.core.ui.components.ScreenList
 import com.vb.kanjimap_android.core.ui.components.SurfaceSection
@@ -22,6 +22,7 @@ import com.vb.kanjimap_android.feature.library.presentation.components.RelatedWo
 @Composable
 fun KanjiDetailsScreen(
     uiState: KanjiDetailsUiState,
+    onBackClick: () -> Unit,
     onRetry: () -> Unit,
     onSaveClick: () -> Unit,
     onWordClick: (Long) -> Unit,
@@ -63,18 +64,17 @@ fun KanjiDetailsScreen(
                             details.kanji.jlptLevel?.let {
                                 append(" • $it")
                             }
+                        },
+                        onBackClick = onBackClick,
+                        actions = {
+                            TextButton(
+                                onClick = onSaveClick,
+                                enabled = !uiState.isSaved
+                            ) {
+                                Text(if (uiState.isSaved) "Сохранено" else "Сохранить")
+                            }
                         }
                     )
-                }
-
-                item {
-                    PrimaryButton(
-                        onClick = onSaveClick,
-                        enabled = !uiState.isSaved,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(if (uiState.isSaved) "Кандзи сохранено" else "Сохранить кандзи")
-                    }
                 }
 
                 item {

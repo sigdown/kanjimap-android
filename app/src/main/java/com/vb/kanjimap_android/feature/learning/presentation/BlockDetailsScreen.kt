@@ -18,6 +18,7 @@ import com.vb.kanjimap_android.feature.learning.presentation.components.WordsChi
 @Composable
 fun BlockDetailsScreen(
     uiState: BlockDetailsUiState,
+    onBackClick: () -> Unit,
     onRetry: () -> Unit,
     onStudyWordsClick: () -> Unit,
     onStudyKanjiClick: () -> Unit,
@@ -55,7 +56,8 @@ fun BlockDetailsScreen(
                 item {
                     ScreenHeader(
                         title = details.block.title,
-                        subtitle = details.block.description
+                        subtitle = details.block.description,
+                        onBackClick = onBackClick
                     )
                 }
 

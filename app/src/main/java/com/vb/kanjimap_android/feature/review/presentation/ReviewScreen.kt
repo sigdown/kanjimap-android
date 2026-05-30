@@ -3,7 +3,6 @@ package com.vb.kanjimap_android.feature.review.presentation
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -13,7 +12,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
 import com.vb.kanjimap_android.core.ui.components.BodyText
@@ -23,7 +21,6 @@ import com.vb.kanjimap_android.core.ui.components.MetaText
 import com.vb.kanjimap_android.core.ui.components.PrimaryButton
 import com.vb.kanjimap_android.core.ui.components.ScreenHeader
 import com.vb.kanjimap_android.core.ui.components.ScreenList
-import com.vb.kanjimap_android.core.ui.components.ScreenTitleText
 import com.vb.kanjimap_android.core.ui.components.SecondaryButton
 import com.vb.kanjimap_android.core.ui.components.SurfaceSection
 import com.vb.kanjimap_android.core.ui.theme.CoreSpacing
@@ -35,6 +32,7 @@ import com.vb.kanjimap_android.feature.review.domain.model.ReviewResult
 fun ReviewScreen(
     uiState: ReviewUiState,
     onAuthClick: () -> Unit,
+    onBackClick: () -> Unit,
     onClose: () -> Unit,
     onGoHome: () -> Unit,
     onRefresh: () -> Unit,
@@ -52,7 +50,8 @@ fun ReviewScreen(
                 item {
                     ScreenHeader(
                         title = "Повторение",
-                        subtitle = "Повторение доступно после входа в аккаунт"
+                        subtitle = "Повторение доступно после входа в аккаунт",
+                        onBackClick = onBackClick
                     )
                 }
                 item {
@@ -85,6 +84,7 @@ fun ReviewScreen(
                     ReviewHeader(
                         title = "Повторение завершено",
                         subtitle = "Все карточки на сегодня пройдены",
+                        onBackClick = onBackClick,
                         onRefresh = onRefresh
                     )
                 }
@@ -107,6 +107,7 @@ fun ReviewScreen(
                     ReviewHeader(
                         title = "На сегодня повторений нет",
                         subtitle = "Возвращайтесь позже",
+                        onBackClick = onBackClick,
                         onRefresh = onRefresh
                     )
                 }
@@ -130,6 +131,7 @@ fun ReviewScreen(
                             ReviewItemType.KANJI -> item.kanji?.literal ?: "Кандзи"
                         },
                         subtitle = uiState.progressText,
+                        onBackClick = onBackClick,
                         onRefresh = onRefresh
                     )
                 }
@@ -178,21 +180,14 @@ fun ReviewScreen(
 private fun ReviewHeader(
     title: String,
     subtitle: String,
+    onBackClick: () -> Unit,
     onRefresh: () -> Unit
 ) {
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(CoreSpacing.xs)
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            ScreenTitleText(
-                text = title,
-                modifier = Modifier.weight(1f)
-            )
+    ScreenHeader(
+        title = title,
+        subtitle = subtitle,
+        onBackClick = onBackClick,
+        actions = {
             IconButton(onClick = onRefresh) {
                 Icon(
                     imageVector = Icons.Outlined.Refresh,
@@ -200,8 +195,7 @@ private fun ReviewHeader(
                 )
             }
         }
-        MetaText(subtitle)
-    }
+    )
 }
 
 @Composable

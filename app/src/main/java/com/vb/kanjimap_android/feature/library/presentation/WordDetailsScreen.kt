@@ -5,13 +5,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.vb.kanjimap_android.core.ui.components.BodyText
 import com.vb.kanjimap_android.core.ui.components.ErrorView
 import com.vb.kanjimap_android.core.ui.components.LoadingView
 import com.vb.kanjimap_android.core.ui.components.MetaText
-import com.vb.kanjimap_android.core.ui.components.PrimaryButton
 import com.vb.kanjimap_android.core.ui.components.ScreenHeader
 import com.vb.kanjimap_android.core.ui.components.ScreenList
 import com.vb.kanjimap_android.core.ui.components.SurfaceSection
@@ -23,6 +23,7 @@ import com.vb.kanjimap_android.feature.library.presentation.components.RelatedWo
 @Composable
 fun WordDetailsScreen(
     uiState: WordDetailsUiState,
+    onBackClick: () -> Unit,
     onRetry: () -> Unit,
     onSaveClick: () -> Unit,
     onKanjiClick: (Long) -> Unit,
@@ -64,18 +65,17 @@ fun WordDetailsScreen(
                                 append(" • ")
                                 append(meta.joinToString(" • "))
                             }
+                        },
+                        onBackClick = onBackClick,
+                        actions = {
+                            TextButton(
+                                onClick = onSaveClick,
+                                enabled = !uiState.isSaved
+                            ) {
+                                Text(if (uiState.isSaved) "Сохранено" else "Сохранить")
+                            }
                         }
                     )
-                }
-
-                item {
-                    PrimaryButton(
-                        onClick = onSaveClick,
-                        enabled = !uiState.isSaved,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(if (uiState.isSaved) "Слово сохранено" else "Сохранить слово")
-                    }
                 }
 
                 item {
