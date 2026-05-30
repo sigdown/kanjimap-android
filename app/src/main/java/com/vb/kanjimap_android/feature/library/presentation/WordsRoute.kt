@@ -8,6 +8,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 @Composable
 fun WordsRoute(
+    onOpenSaved: () -> Unit,
     onWordClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues()
@@ -19,6 +20,7 @@ fun WordsRoute(
         uiState = uiState.wordSearch,
         onQueryChange = viewModel::updateWordsQuery,
         onSearch = viewModel::searchWords,
+        onOpenSaved = onOpenSaved,
         onWordClick = onWordClick,
         modifier = modifier,
         contentPadding = contentPadding

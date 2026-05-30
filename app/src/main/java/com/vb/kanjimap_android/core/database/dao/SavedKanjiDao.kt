@@ -15,6 +15,9 @@ interface SavedKanjiDao {
     @Query("SELECT * FROM saved_kanji WHERE kanjiId = :kanjiId")
     fun getById(kanjiId: Long): Flow<SavedKanjiEntity?>
 
+    @Query("SELECT * FROM saved_kanji WHERE kanjiId = :kanjiId")
+    suspend fun getByIdOnce(kanjiId: Long): SavedKanjiEntity?
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(entity: SavedKanjiEntity)
 

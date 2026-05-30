@@ -13,7 +13,6 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Search
-import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -301,7 +300,6 @@ fun KanjiListItem(
 @Composable
 fun KanjisRow(
     kanjis: List<Kanji>,
-    onKanjiClick: (Long) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyRow(
@@ -309,9 +307,9 @@ fun KanjisRow(
         horizontalArrangement = Arrangement.spacedBy(CoreSpacing.sm)
     ) {
         items(kanjis, key = { it.kanjiId }) { kanji ->
-            AssistChip(
-                onClick = { onKanjiClick(kanji.kanjiId) },
-                label = { Text(kanji.literal) }
+            Text(
+                text = kanji.literal,
+                style = MaterialTheme.typography.bodyLarge
             )
         }
     }
@@ -320,7 +318,6 @@ fun KanjisRow(
 @Composable
 fun RelatedWordsColumn(
     words: List<Word>,
-    onWordClick: (Long) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -331,7 +328,6 @@ fun RelatedWordsColumn(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { onWordClick(word.wordId) }
                     .padding(vertical = CoreSpacing.xs),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically

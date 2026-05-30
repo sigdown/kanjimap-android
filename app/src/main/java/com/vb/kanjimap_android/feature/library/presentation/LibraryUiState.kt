@@ -9,7 +9,9 @@ data class LibraryUiState(
     val wordSearch: WordSearchUiState = WordSearchUiState(),
     val kanjiSearch: KanjiSearchUiState = KanjiSearchUiState(),
     val wordDetails: WordDetailsUiState = WordDetailsUiState(),
-    val kanjiDetails: KanjiDetailsUiState = KanjiDetailsUiState()
+    val kanjiDetails: KanjiDetailsUiState = KanjiDetailsUiState(),
+    val savedWords: SavedWordsUiState = SavedWordsUiState(),
+    val savedKanji: SavedKanjiUiState = SavedKanjiUiState()
 )
 
 data class WordSearchUiState(
@@ -30,12 +32,22 @@ data class WordDetailsUiState(
     val wordId: Long? = null,
     val item: WordDetails? = null,
     val isLoading: Boolean = false,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+    val isSaved: Boolean = false
 )
 
 data class KanjiDetailsUiState(
     val kanjiId: Long? = null,
     val item: KanjiDetails? = null,
     val isLoading: Boolean = false,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+    val isSaved: Boolean = false
+)
+
+data class SavedWordsUiState(
+    val items: List<Word> = emptyList()
+)
+
+data class SavedKanjiUiState(
+    val items: List<Kanji> = emptyList()
 )

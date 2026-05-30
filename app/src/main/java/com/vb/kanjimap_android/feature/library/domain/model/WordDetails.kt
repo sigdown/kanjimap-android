@@ -1,5 +1,8 @@
 package com.vb.kanjimap_android.feature.library.domain.model
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class WordDetails(
     val word: Word,
     val meanings: List<WordMeaning>,

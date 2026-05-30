@@ -10,5 +10,6 @@ data class SavedWordEntity(
     val readingKana: String,
     val jlptLevel: String? = null,
     val topicName: String? = null,
+    val detailsJson: String? = null,
     val savedAt: Long
 )

@@ -70,9 +70,10 @@ fun KanjiDetailsScreen(
                 item {
                     PrimaryButton(
                         onClick = onSaveClick,
+                        enabled = !uiState.isSaved,
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text("Сохранить кандзи")
+                        Text(if (uiState.isSaved) "Кандзи сохранено" else "Сохранить кандзи")
                     }
                 }
 
@@ -118,8 +119,7 @@ fun KanjiDetailsScreen(
                             MetaText("Слова пока не указаны.")
                         } else {
                             RelatedWordsColumn(
-                                words = details.words,
-                                onWordClick = onWordClick
+                                words = details.words
                             )
                         }
                     }

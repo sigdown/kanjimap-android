@@ -71,9 +71,10 @@ fun WordDetailsScreen(
                 item {
                     PrimaryButton(
                         onClick = onSaveClick,
+                        enabled = !uiState.isSaved,
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text("Сохранить слово")
+                        Text(if (uiState.isSaved) "Слово сохранено" else "Сохранить слово")
                     }
                 }
 
@@ -98,8 +99,7 @@ fun WordDetailsScreen(
                             MetaText("Для этого слова кандзи не указаны.")
                         } else {
                             KanjisRow(
-                                kanjis = details.kanjis,
-                                onKanjiClick = onKanjiClick
+                                kanjis = details.kanjis
                             )
                         }
                     }
@@ -117,8 +117,7 @@ fun WordDetailsScreen(
                                         relatedWord.note?.let { MetaText(it) }
                                         relatedWord.word?.let { word ->
                                             RelatedWordsColumn(
-                                                words = listOf(word),
-                                                onWordClick = onRelatedWordClick
+                                                words = listOf(word)
                                             )
                                         }
                                     }

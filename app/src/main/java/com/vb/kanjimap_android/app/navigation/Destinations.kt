@@ -7,8 +7,9 @@ sealed class Destination(val route: String) {
     data object Kanji : Destination("kanji")
     data object Auth : Destination("auth")
     data object Review : Destination("review")
-    data object Saved : Destination("saved")
     data object Profile : Destination("profile")
+    data object SavedWords : Destination("saved_words")
+    data object SavedKanji : Destination("saved_kanji")
     data object WordDetails : Destination("word_details/{wordId}") {
         fun createRoute(wordId: Long): String = "word_details/$wordId"
     }
@@ -45,7 +46,8 @@ object Destinations {
         Destination.BlockDetails.route,
         Destination.Study.route,
         Destination.Review.route,
-        Destination.Saved.route,
+        Destination.SavedWords.route,
+        Destination.SavedKanji.route,
         Destination.Profile.route
     )
 

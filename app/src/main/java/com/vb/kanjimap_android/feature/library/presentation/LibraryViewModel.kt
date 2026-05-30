@@ -3,7 +3,13 @@ package com.vb.kanjimap_android.feature.library.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vb.kanjimap_android.feature.library.domain.usecase.GetKanjiDetailsUseCase
+import com.vb.kanjimap_android.feature.library.domain.usecase.GetSavedKanjiUseCase
+import com.vb.kanjimap_android.feature.library.domain.usecase.GetSavedWordsUseCase
 import com.vb.kanjimap_android.feature.library.domain.usecase.GetWordDetailsUseCase
+import com.vb.kanjimap_android.feature.library.domain.usecase.IsKanjiSavedUseCase
+import com.vb.kanjimap_android.feature.library.domain.usecase.IsWordSavedUseCase
+import com.vb.kanjimap_android.feature.library.domain.usecase.SaveKanjiUseCase
+import com.vb.kanjimap_android.feature.library.domain.usecase.SaveWordUseCase
 import com.vb.kanjimap_android.feature.library.domain.usecase.SearchKanjiUseCase
 import com.vb.kanjimap_android.feature.library.domain.usecase.SearchWordsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -25,7 +31,13 @@ class LibraryViewModel @Inject constructor(
     private val searchWordsUseCase: SearchWordsUseCase,
     private val searchKanjiUseCase: SearchKanjiUseCase,
     private val getWordDetailsUseCase: GetWordDetailsUseCase,
-    private val getKanjiDetailsUseCase: GetKanjiDetailsUseCase
+    private val getKanjiDetailsUseCase: GetKanjiDetailsUseCase,
+    private val saveWordUseCase: SaveWordUseCase,
+    private val saveKanjiUseCase: SaveKanjiUseCase,
+    private val getSavedWordsUseCase: GetSavedWordsUseCase,
+    private val getSavedKanjiUseCase: GetSavedKanjiUseCase,
+    private val isWordSavedUseCase: IsWordSavedUseCase,
+    private val isKanjiSavedUseCase: IsKanjiSavedUseCase
 ) : ViewModel() {
 
     private companion object {
@@ -41,6 +53,22 @@ class LibraryViewModel @Inject constructor(
 
     private var wordSearchJob: Job? = null
     private var kanjiSearchJob: Job? = null
+    private var wordSavedStatusJob: Job? = null
+    private var kanjiSavedStatusJob: Job? = null
+
+    init {
+        viewModelScope.launch {
+            getSavedWordsUseCase().collect { words ->
+                _uiState.update { it.copy(savedWords = SavedWordsUiState(items = words)) }
+            }
+        }
+
+        viewModelScope.launch {
+            getSavedKanjiUseCase().collect { kanji ->
+                _uiState.update { it.copy(savedKanji = SavedKanjiUiState(items = kanji)) }
+            }
+        }
+    }
 
     fun updateWordsQuery(query: String) {
         _uiState.update {
@@ -221,6 +249,7 @@ class LibraryViewModel @Inject constructor(
     }
 
     fun loadWordDetails(id: Long) {
+        observeWordSavedStatus(id)
         if (_uiState.value.wordDetails.wordId == id &&
             _uiState.value.wordDetails.item != null &&
             _uiState.value.wordDetails.errorMessage == null
@@ -270,6 +299,7 @@ class LibraryViewModel @Inject constructor(
     }
 
     fun loadKanjiDetails(id: Long) {
+        observeKanjiSavedStatus(id)
         if (_uiState.value.kanjiDetails.kanjiId == id &&
             _uiState.value.kanjiDetails.item != null &&
             _uiState.value.kanjiDetails.errorMessage == null
@@ -319,10 +349,60 @@ class LibraryViewModel @Inject constructor(
     }
 
     fun onSaveWordClick() {
-        _events.tryEmit("Сохранение слова будет добавлено позже")
+        val details = _uiState.value.wordDetails.item ?: return
+        if (_uiState.value.wordDetails.isSaved) {
+            _events.tryEmit("Слово уже сохранено")
+            return
+        }
+
+        viewModelScope.launch {
+            runCatching { saveWordUseCase(details) }
+                .onSuccess { _events.emit("Слово сохранено") }
+                .onFailure { throwable ->
+                    _events.emit(throwable.message ?: "Не удалось сохранить слово")
+                }
+        }
     }
 
     fun onSaveKanjiClick() {
-        _events.tryEmit("Сохранение кандзи будет добавлено позже")
+        val details = _uiState.value.kanjiDetails.item ?: return
+        if (_uiState.value.kanjiDetails.isSaved) {
+            _events.tryEmit("Кандзи уже сохранено")
+            return
+        }
+
+        viewModelScope.launch {
+            runCatching { saveKanjiUseCase(details) }
+                .onSuccess { _events.emit("Кандзи сохранено") }
+                .onFailure { throwable ->
+                    _events.emit(throwable.message ?: "Не удалось сохранить кандзи")
+                }
+        }
+    }
+
+    private fun observeWordSavedStatus(wordId: Long) {
+        wordSavedStatusJob?.cancel()
+        wordSavedStatusJob = viewModelScope.launch {
+            isWordSavedUseCase(wordId).collect { isSaved ->
+                _uiState.update {
+                    it.copy(
+                        wordDetails = it.wordDetails.copy(isSaved = isSaved)
+                    )
+                }
+            }
+        }
+    }
+
+    private fun observeKanjiSavedStatus(kanjiId: Long) {
+        kanjiSavedStatusJob?.cancel()
+        kanjiSavedStatusJob = viewModelScope.launch {
+            isKanjiSavedUseCase(kanjiId).collect { isSaved ->
+                _uiState.update {
+                    it.copy(
+                        kanjiDetails = it.kanjiDetails.copy(isSaved = isSaved)
+                    )
+                }
+            }
+        }
     }
 }

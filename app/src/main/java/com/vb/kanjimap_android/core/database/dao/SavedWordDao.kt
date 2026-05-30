@@ -15,6 +15,9 @@ interface SavedWordDao {
     @Query("SELECT * FROM saved_words WHERE wordId = :wordId")
     fun getById(wordId: Long): Flow<SavedWordEntity?>
 
+    @Query("SELECT * FROM saved_words WHERE wordId = :wordId")
+    suspend fun getByIdOnce(wordId: Long): SavedWordEntity?
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(entity: SavedWordEntity)
 

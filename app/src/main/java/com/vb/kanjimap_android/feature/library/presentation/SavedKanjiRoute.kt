@@ -1,14 +1,13 @@
 package com.vb.kanjimap_android.feature.library.presentation
 
-import androidx.compose.runtime.Composable
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 @Composable
-fun KanjiRoute(
-    onOpenSaved: () -> Unit,
+fun SavedKanjiRoute(
     onKanjiClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues()
@@ -16,11 +15,8 @@ fun KanjiRoute(
     val viewModel: LibraryViewModel = hiltViewModel()
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
 
-    KanjiScreen(
-        uiState = uiState.kanjiSearch,
-        onQueryChange = viewModel::updateKanjiQuery,
-        onSearch = viewModel::searchKanji,
-        onOpenSaved = onOpenSaved,
+    SavedKanjiScreen(
+        uiState = uiState.savedKanji,
         onKanjiClick = onKanjiClick,
         modifier = modifier,
         contentPadding = contentPadding

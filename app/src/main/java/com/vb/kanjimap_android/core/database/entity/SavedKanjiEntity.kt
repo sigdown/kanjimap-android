@@ -9,5 +9,6 @@ data class SavedKanjiEntity(
     val literal: String,
     val strokeCount: Int? = null,
     val jlptLevel: String? = null,
+    val detailsJson: String? = null,
     val savedAt: Long
 )

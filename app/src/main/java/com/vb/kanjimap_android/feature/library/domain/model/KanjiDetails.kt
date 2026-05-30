@@ -1,5 +1,8 @@
 package com.vb.kanjimap_android.feature.library.domain.model
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class KanjiDetails(
     val kanji: Kanji,
     val onReadings: List<String>,

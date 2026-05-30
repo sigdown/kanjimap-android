@@ -14,6 +14,8 @@ import com.vb.kanjimap_android.feature.library.domain.model.RelatedWord
 import com.vb.kanjimap_android.feature.library.domain.model.Word
 import com.vb.kanjimap_android.feature.library.domain.model.WordDetails
 import com.vb.kanjimap_android.feature.library.domain.model.WordMeaning
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 fun WordSearchItemDto.toDomain(): Word = Word(
     wordId = wordId,
@@ -66,3 +68,15 @@ fun KanjiDetailsDto.toDomain(): KanjiDetails = KanjiDetails(
     meanings = meanings.map(KanjiMeaningDto::toDomain),
     words = words.map(WordSearchItemDto::toDomain)
 )
+
+private val detailsJson = Json {
+    ignoreUnknownKeys = true
+}
+
+fun WordDetails.toJson(): String = detailsJson.encodeToString(this)
+
+fun String.toWordDetails(): WordDetails = detailsJson.decodeFromString(this)
+
+fun KanjiDetails.toJson(): String = detailsJson.encodeToString(this)
+
+fun String.toKanjiDetails(): KanjiDetails = detailsJson.decodeFromString(this)

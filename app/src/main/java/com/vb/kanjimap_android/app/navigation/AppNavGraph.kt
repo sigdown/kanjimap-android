@@ -31,6 +31,8 @@ import com.vb.kanjimap_android.feature.learning.presentation.StudyMode
 import com.vb.kanjimap_android.feature.learning.presentation.StudyRoute
 import com.vb.kanjimap_android.feature.library.presentation.KanjiDetailsRoute
 import com.vb.kanjimap_android.feature.library.presentation.KanjiRoute
+import com.vb.kanjimap_android.feature.library.presentation.SavedKanjiRoute
+import com.vb.kanjimap_android.feature.library.presentation.SavedWordsRoute
 import com.vb.kanjimap_android.feature.library.presentation.WordDetailsRoute
 import com.vb.kanjimap_android.feature.library.presentation.WordsRoute
 import com.vb.kanjimap_android.feature.review.presentation.ReviewRoute
@@ -85,6 +87,7 @@ fun AppNavGraph(
         }
         composable(Destination.Words.route) {
             WordsRoute(
+                onOpenSaved = { navController.navigate(Destination.SavedWords.route) },
                 onWordClick = { wordId ->
                     navController.navigate(Destination.WordDetails.createRoute(wordId))
                 },
@@ -93,6 +96,7 @@ fun AppNavGraph(
         }
         composable(Destination.Kanji.route) {
             KanjiRoute(
+                onOpenSaved = { navController.navigate(Destination.SavedKanji.route) },
                 onKanjiClick = { kanjiId ->
                     navController.navigate(Destination.KanjiDetails.createRoute(kanjiId))
                 },
@@ -131,11 +135,20 @@ fun AppNavGraph(
                 contentPadding = innerPadding
             )
         }
-        composable(Destination.Saved.route) {
-            PlaceholderScreen(
-                title = "Saved",
-                description = "Saved content placeholder.",
-                modifier = Modifier.padding(innerPadding)
+        composable(Destination.SavedWords.route) {
+            SavedWordsRoute(
+                onWordClick = { wordId ->
+                    navController.navigate(Destination.WordDetails.createRoute(wordId))
+                },
+                contentPadding = innerPadding
+            )
+        }
+        composable(Destination.SavedKanji.route) {
+            SavedKanjiRoute(
+                onKanjiClick = { kanjiId ->
+                    navController.navigate(Destination.KanjiDetails.createRoute(kanjiId))
+                },
+                contentPadding = innerPadding
             )
         }
         composable(Destination.Profile.route) {
