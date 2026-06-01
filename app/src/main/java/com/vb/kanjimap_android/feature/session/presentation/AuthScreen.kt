@@ -23,6 +23,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -58,7 +59,11 @@ fun AuthScreen(
         "Нет аккаунта? Регистрация"
     }
 
-    Surface(modifier = modifier.fillMaxSize()) {
+    Surface(
+        modifier = modifier
+            .fillMaxSize()
+            .testTag("screen_auth")
+    ) {
         Box(modifier = Modifier.fillMaxSize()) {
             Column(
                 modifier = Modifier
@@ -98,7 +103,9 @@ fun AuthScreen(
                                 singleLine = true,
                                 enabled = !uiState.isLoading,
                                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-                                modifier = Modifier.fillMaxWidth()
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .testTag("auth_username_field")
                             )
                         }
 
@@ -114,7 +121,9 @@ fun AuthScreen(
                                 keyboardType = KeyboardType.Email,
                                 imeAction = ImeAction.Next
                             ),
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .testTag(if (isRegisterMode) "auth_email_field" else "auth_login_field")
                         )
 
                         OutlinedTextField(
@@ -128,7 +137,9 @@ fun AuthScreen(
                                 keyboardType = KeyboardType.Password,
                                 imeAction = ImeAction.Done
                             ),
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .testTag("auth_password_field")
                         )
 
                         PrimaryButton(
@@ -146,7 +157,9 @@ fun AuthScreen(
                                 email = email,
                                 password = password
                             ),
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .testTag("auth_submit_button")
                         ) {
                             Text(if (isRegisterMode) "Зарегистрироваться" else "Войти")
                         }

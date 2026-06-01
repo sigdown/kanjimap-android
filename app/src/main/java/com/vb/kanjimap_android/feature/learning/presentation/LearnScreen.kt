@@ -10,6 +10,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import com.vb.kanjimap_android.core.ui.components.ErrorView
 import com.vb.kanjimap_android.core.ui.components.LoadingView
 import com.vb.kanjimap_android.core.ui.components.PrimaryButton
@@ -32,17 +33,23 @@ fun LearnScreen(
     contentPadding: PaddingValues = PaddingValues()
 ) {
     if (authState == SessionAuthState.CHECKING) {
-        LoadingView(message = "Проверяем сессию")
+        LoadingView(
+            message = "Проверяем сессию",
+            modifier = modifier.testTag("screen_learn")
+        )
         return
     }
 
     if (uiState.isLoading) {
-        LoadingView(message = "Загружаем блоки")
+        LoadingView(
+            message = "Загружаем блоки",
+            modifier = modifier.testTag("screen_learn")
+        )
         return
     }
 
     ScreenList(
-        modifier = modifier,
+        modifier = modifier.testTag("screen_learn"),
         contentPadding = contentPadding
     ) {
         item {

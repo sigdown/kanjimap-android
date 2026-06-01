@@ -8,6 +8,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import com.vb.kanjimap_android.core.ui.components.ScreenHeader
 import com.vb.kanjimap_android.core.ui.components.ScreenList
 import com.vb.kanjimap_android.core.ui.components.SurfaceSection
@@ -25,7 +26,7 @@ fun KanjiScreen(
     contentPadding: PaddingValues = PaddingValues()
 ) {
     ScreenList(
-        modifier = modifier,
+        modifier = modifier.testTag("screen_kanji"),
         contentPadding = contentPadding
     ) {
         item {
@@ -33,7 +34,10 @@ fun KanjiScreen(
                 title = "Кандзи",
                 subtitle = "Поиск символов и базовой информации",
                 actions = {
-                    IconButton(onClick = onOpenSaved) {
+                    IconButton(
+                        onClick = onOpenSaved,
+                        modifier = Modifier.testTag("open_saved_kanji_button")
+                    ) {
                         Icon(
                             imageVector = Icons.Outlined.Save,
                             contentDescription = "Сохранённые кандзи"
@@ -48,6 +52,7 @@ fun KanjiScreen(
                 LibrarySearchField(
                     value = uiState.query,
                     label = "Найти кандзи",
+                    modifier = Modifier.testTag("kanji_search_field"),
                     onValueChange = onQueryChange,
                     items = uiState.items,
                     isLoading = uiState.isLoading,

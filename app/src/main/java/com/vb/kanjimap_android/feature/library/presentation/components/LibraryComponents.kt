@@ -72,12 +72,12 @@ fun <T> LibrarySearchField(
         onExpandedChange = { shouldExpand ->
             expanded = shouldExpand && hasDropdownContent
         },
-        modifier = modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth()
     ) {
         OutlinedTextField(
             value = value,
             onValueChange = onValueChange,
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxWidth()
                 .menuAnchor(
                     type = MenuAnchorType.PrimaryEditable,
